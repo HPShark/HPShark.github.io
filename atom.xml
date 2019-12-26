@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2019-12-26T10:29:05.861Z</updated>
+  <updated>2019-12-26T10:33:27.023Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -17,11 +17,33 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>语雀文章测试</title>
+    <link href="https://www.happyshark.cn/2019/12/26/yuque/%E8%AF%AD%E9%9B%80%E6%96%87%E7%AB%A0%E6%B5%8B%E8%AF%95/"/>
+    <id>https://www.happyshark.cn/2019/12/26/yuque/%E8%AF%AD%E9%9B%80%E6%96%87%E7%AB%A0%E6%B5%8B%E8%AF%95/</id>
+    <published>2019-12-26T08:10:32.000Z</published>
+    <updated>2019-12-26T10:33:27.023Z</updated>
+    
+    <content type="html"><![CDATA[<html><head><link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script></head><body><p>文章写自<a href="https://www.yuque.com/" target="_blank" rel="noopener">语雀</a></p><p>图片测试：</p><ol><li>图片来自语雀</li></ol><p><a href="https://cdn.nlark.com/yuque/0/2019/png/402044/1577347915595-ae7acd53-10f0-489b-8604-d308a369702a.png#align=left&display=inline&height=416&originHeight=416&originWidth=800&size=0&status=done&style=none&width=800" data-fancybox="group" data-caption class="fancybox"><img alt title data-src="https://cdn.nlark.com/yuque/0/2019/png/402044/1577347915595-ae7acd53-10f0-489b-8604-d308a369702a.png#align=left&display=inline&height=416&originHeight=416&originWidth=800&size=0&status=done&style=none&width=800" class="lazyload"></a></p><ol><li>图片来自onedrive：</li></ol><p><a href="https://qjtwaw.ch.files.1drv.com/y4mRCpWKYm4F30wi_g7e0o2AMLVJ1UQdGnBr7lFlndm69SPXBTQI5pMmVJ_JH7jnzVBqmk3A3Dbmpr7KiSXxYT5ST5S0c1XR6gCbaTavd4C1HTZKjzv0UgO2yueunkuGn8hM9ZoMLOzLwkNC_CVDs56XahMpeAX9AMI6qZlJwEQ_-Sb_R3UfNhUitnPtuPaXlwx8jPqKeeKJ8qtM4JtrD50rA?width=1200&height=500&cropmode=none" data-fancybox="group" data-caption="测试标题" class="fancybox"><img alt="测试标题" title="测试标题" data-src="https://qjtwaw.ch.files.1drv.com/y4mRCpWKYm4F30wi_g7e0o2AMLVJ1UQdGnBr7lFlndm69SPXBTQI5pMmVJ_JH7jnzVBqmk3A3Dbmpr7KiSXxYT5ST5S0c1XR6gCbaTavd4C1HTZKjzv0UgO2yueunkuGn8hM9ZoMLOzLwkNC_CVDs56XahMpeAX9AMI6qZlJwEQ_-Sb_R3UfNhUitnPtuPaXlwx8jPqKeeKJ8qtM4JtrD50rA?width=1200&height=500&cropmode=none" class="lazyload"></a></p><ol><li>图片链接转换测试：</li></ol><p><a href="https://cdn.nlark.com/yuque/0/2019/jpeg/402044/1577348603102-d52eca7e-13e1-4043-bf6b-f6bf18341115.jpeg#align=left&display=inline&height=500&name=%E6%B5%8B%E8%AF%95%E6%A0%87%E9%A2%98&originHeight=500&originWidth=1200&size=0&status=done&style=none&width=1200" data-fancybox="group" data-caption="测试标题" class="fancybox"><img alt="测试标题" title="测试标题" data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/402044/1577348603102-d52eca7e-13e1-4043-bf6b-f6bf18341115.jpeg#align=left&display=inline&height=500&name=%E6%B5%8B%E8%AF%95%E6%A0%87%E9%A2%98&originHeight=500&originWidth=1200&size=0&status=done&style=none&width=1200" class="lazyload"></a></p><ol><li>语雀图片链接转换</li></ol><p><a href="https://cdn.nlark.com/yuque/0/2019/jpeg/402044/1577348636613-d368d6c6-3990-462f-9fef-86b2bb18e8ce.jpeg#align=left&display=inline&height=500&originHeight=500&originWidth=1200&size=0&status=done&style=none&width=1200" data-fancybox="group" data-caption class="fancybox"><img alt title data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/402044/1577348636613-d368d6c6-3990-462f-9fef-86b2bb18e8ce.jpeg#align=left&display=inline&height=500&originHeight=500&originWidth=1200&size=0&status=done&style=none&width=1200" class="lazyload"></a></p></body></html>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;html&gt;&lt;head&gt;&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>hexo博客上线</title>
     <link href="https://www.happyshark.cn/2019/12/26/hello-world/"/>
     <id>https://www.happyshark.cn/2019/12/26/hello-world/</id>
     <published>2019-12-26T06:00:00.000Z</published>
-    <updated>2019-12-26T10:29:05.861Z</updated>
+    <updated>2019-12-26T10:32:38.943Z</updated>
     
     <content type="html"><![CDATA[<html><head><link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script></head><body><pre><code>博客又双叒叕上线了，这次使用的是hexo + Github Pages + travis CI + 语雀 + serverless + onedrive图床，部署完成之后可以直接在语雀上编辑文章然后自动发布到博客，云端写作不是梦hhh </code></pre><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">bash</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure></div><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">bash</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure></div><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">bash</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure></div><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">bash</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure></div><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p></body></html>]]></content>
     
