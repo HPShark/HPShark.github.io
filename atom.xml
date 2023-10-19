@@ -6,7 +6,7 @@
   <link href="https://www.happyshark.cn/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2023-04-03T14:00:00.000Z</updated>
+  <updated>2023-10-19T14:00:00.000Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>群辉container Manager修复思源笔记v2.10.x的accessAuthCode执行命令的错误</title>
+    <link href="https://www.happyshark.cn/2023/10/19/%E7%BE%A4%E8%BE%89container%20Manager%E4%BF%AE%E5%A4%8D%E6%80%9D%E6%BA%90%E7%AC%94%E8%AE%B0v2.10.x%E7%9A%84accessAuthCode%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E7%9A%84%E9%94%99%E8%AF%AF/"/>
+    <id>https://www.happyshark.cn/2023/10/19/%E7%BE%A4%E8%BE%89container%20Manager%E4%BF%AE%E5%A4%8D%E6%80%9D%E6%BA%90%E7%AC%94%E8%AE%B0v2.10.x%E7%9A%84accessAuthCode%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E7%9A%84%E9%94%99%E8%AF%AF/</id>
+    <published>2023-10-19T14:00:00.000Z</published>
+    <updated>2023-10-19T14:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>群晖自从升级到DSM7.2之后原来的docker就变成container Manager了，新的管理面板没法修改容器的执行命令，只能通过ssh修改了。</p><p><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019221429031.png" alt="image-20231019221429031"></p><p>刚好思源笔记的docker最新版增加了accessAuthCode检查，如果启动命令没有accessAuthCode的话会报错无法启动，需要在执行命令中添加<code>-accessAuthCode</code>参数，故记录一下配置过程。</p><h1 id="配置过程"><a href="#配置过程" class="headerlink" title="配置过程"></a>配置过程</h1><ol><li><p>先在群晖的<code>控制面板-终端机和SNMP-终端机</code>界面启用<code>ssh功能</code>。<br><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019220626878.png" alt="image-20231019220626878"></p></li><li><p>在群晖的<code>套件中心</code>里停止container Manager运行。<br><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019223208191.png" alt="image-20231019223208191"></p></li><li><p>使用ssh软件登陆群晖后台，我这里用的finalshell，账号就是nas的管理员账号，密码就是管理员密码。<br><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019220731971.png" alt="image-20231019220731971"></p></li><li><p>输入<code>sudo su</code>指令，获取root权限，密码就是nas管理员账号的密码。</p><p><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019221053321.png" alt="image-20231019221053321"></p></li><li><p>执行命令<code>docker ps -a --no-trunc</code>，查看需要修改执行命令的容器名<br><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019221327696.png" alt="image-20231019221327696"></p></li><li><p>执行命令<code>cd /volume1/\@docker/containers</code>进入docker的容器文件夹，输入<code>ls</code>查看需要修改的容器文件夹，然后<code>cd &lt;容器id&gt;</code>并进入。</p><p><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019221901980.png" alt="image-20231019221901980"></p></li><li><p>执行命令<code>vi config.v2.json</code>修改容器的配置文件，找到<code>Args</code>和<code>Cmd</code>，在里头增加新的命令和参数。</p><blockquote><p>Args是参数，Cmd是完整命令,这里都要填</p></blockquote><p>修改后的Args如下：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;Args&quot;:[&quot;-workspace&quot;,&quot;/siyuan/workspace/&quot;,&quot;-accessAuthCode&quot;,&quot;itseclab&quot;],</span><br></pre></td></tr></table></figure><p>修改后的Cmd如下：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">,&quot;Cmd&quot;:[&quot;-workspace&quot;,&quot;/siyuan/workspace/&quot;,&quot;-accessAuthCode&quot;,&quot;itseclab&quot;],</span><br></pre></td></tr></table></figure><p><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019223013922.png" alt="image-20231019223013922"></p></li><li><p>保存退出，然后回到群晖的<code>套件中心</code>，运行container Manager。<br><img src="https://blogimages.happyshark.cn/%E7%BE%A4%E6%99%96%E4%BF%AE%E6%94%B9container%20Manager%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E6%96%B9%E6%B3%95/image-20231019223245164.png" alt="image-20231019223245164"></p></li></ol><h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>思源笔记的最最最新版2.10.11貌似又改回去了，不过老版本因为打不开而没法升级到最新版…就死锁了。</p><h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p><a href="https://blog.51cto.com/u_16175484/6828146">群晖 docker 修改命令行启动_mob649e81607bf3的技术博客_51CTO博客</a></p><p><a href="https://www.mmuaa.com/post/52f239637089c8ea.html">docker容器修改启动命令 - 斐斐のBlog (mmuaa.com)</a></p><p><a href="https://www.reddit.com/r/synology/comments/r0rjwk/docker_on_synology_easy_way_to_edit_the_execution/">Docker on Synology - Easy Way to Edit the Execution Command? : synology (reddit.com)</a></p>]]></content>
+    
+    
+    <summary type="html">思源笔记的docker最新版增加了accessAuthCode检查需要增加新的启动命令，群晖的webUI没法修改已经配置好的容器，只能通过ssh修改容器的config来修改执行命令</summary>
+    
+    
+    
+    <category term="实验室大杂烩" scheme="https://www.happyshark.cn/categories/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%A4%A7%E6%9D%82%E7%83%A9/"/>
+    
+    
+    <category term="群晖" scheme="https://www.happyshark.cn/tags/%E7%BE%A4%E6%99%96/"/>
+    
+    <category term="docker" scheme="https://www.happyshark.cn/tags/docker/"/>
+    
+  </entry>
   
   <entry>
     <title>PC,树莓派,安卓的miracl库环境配置</title>
@@ -415,27 +438,6 @@
     
     
     <summary type="html">今天开始学做虾</summary>
-    
-    
-    
-    <category term="厨房里的秘密" scheme="https://www.happyshark.cn/categories/%E5%8E%A8%E6%88%BF%E9%87%8C%E7%9A%84%E7%A7%98%E5%AF%86/"/>
-    
-    
-    <category term="家的味道" scheme="https://www.happyshark.cn/tags/%E5%AE%B6%E7%9A%84%E5%91%B3%E9%81%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>红烧鱼</title>
-    <link href="https://www.happyshark.cn/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/"/>
-    <id>https://www.happyshark.cn/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/</id>
-    <published>2022-02-09T04:00:00.000Z</published>
-    <updated>2022-02-09T04:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<hr><ol><li><p>把鱼鳃 内胆 鱼鳞处理好，抹盐淹一会</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120226539.png" alt="image-20220210120226539"></p></li><li><p>锅里倒油至冒烟放鱼煎一下（油热不粘锅）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120402098.png" alt="image-20220210120402098"></p></li><li><p>放酱油，料酒，耗油，葱，蒜，可选辣椒，然后改小火，盖上锅盖炖到水干（大概七八分钟）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120419613.png" alt="image-20220210120419613"></p></li><li><p>4分钟左右可以开锅尝一下咸淡，加盐，放点白糖提鲜继续炖，熟了之后改大火收汁</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120439074.png" alt="image-20220210120439074"></p></li><li><p>最后再加点葱提色，鸡精提鲜，出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120458363.png" alt="image-20220210120458363"></p></li></ol>]]></content>
-    
-    
-    <summary type="html">我还是喜欢吃我爸做的红烧鱼，清蒸没味Ψ(￣∀￣)Ψ</summary>
     
     
     
