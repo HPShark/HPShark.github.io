@@ -6,7 +6,7 @@
   <link href="https://www.happyshark.cn/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2023-10-19T14:00:00.000Z</updated>
+  <updated>2023-10-25T14:00:00.000Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>语法大学习</title>
+    <link href="https://www.happyshark.cn/2023/10/24/%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%AD%A6%E4%B9%A0/"/>
+    <id>https://www.happyshark.cn/2023/10/24/%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%AD%A6%E4%B9%A0/</id>
+    <published>2023-10-24T14:00:00.000Z</published>
+    <updated>2023-10-25T14:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是为了记录一下本人在论文之路上遇到的各种奇怪的语法问题，高中不好好学语文，现在被迫承受语法暴击。感谢师兄/师姐/同门对我稀烂语文语文水平的包容。</p><h1 id="中文语法"><a href="#中文语法" class="headerlink" title="中文语法"></a>中文语法</h1><h2 id="形容词需要有主语描述"><a href="#形容词需要有主语描述" class="headerlink" title="形容词需要有主语描述"></a>形容词需要有主语描述</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>一个满足选择明文攻击下不可区分(Indistinguishability under Chosen Plaintext Attack,IND-CPA)的对称认证加密方案</td><td>一个满足选择明文攻击下<code>密文</code>不可区分(Indistinguishability under Chosen Plaintext Attack,IND-CPA)的对称认证加密方案</td><td>什么不可区分，当然是密文</td></tr></tbody></table></div><h2 id="动词的主语不要丢"><a href="#动词的主语不要丢" class="headerlink" title="动词的主语不要丢"></a>动词的主语不要丢</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>双方随机选择一个密钥对需要交换的秘密$dx$和$dy$加密</td><td>双方<code>分别</code>随机选择一个密钥<code>，并对各自</code>需要交换的秘密$dx$和$dy$加密<code>.</code></td><td>双方是选择一个密钥呢还是分别整两个密钥呢</td></tr></tbody></table></div><h2 id="动词问题"><a href="#动词问题" class="headerlink" title="动词问题"></a>动词问题</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>代理合约的权限管理功能确保只有授权的参与方可以更新合约,进一步增强了系统的安全性.</td><td>代理合约的权限管理功能<code>确保了</code>只有授权的参与方可以更新合约,进一步增强了系统的安全性.</td><td>确保/确保了…</td></tr></tbody></table></div><h2 id="宾语问题"><a href="#宾语问题" class="headerlink" title="宾语问题"></a>宾语问题</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>本文将参考于雷等人[38]提出的链上公平交换方案思路,Alex等人[7]方案的基础上构造链下部分的密钥公平交换方案,以实现在不显著增加链上开销的情况下对已有原子贷款协议进行扩展.</td><td>本文将参考于雷等人[38]提出的链上公平交换方案思路,Alex等人[7]方案的基础上构造链下部分的密钥公平交换方案,以实现在不显著增加链上开销的情况下对已有原子贷款协议<code>的</code>扩展.</td><td>实现…扩展/实现对…的扩展/实现在…的情况下对…的扩展。<code>进行</code>这里多余了</td></tr><tr><td>这不仅减少了链上的计算需求,还提供了更快的响应时间.</td><td>这不仅减少了链上的计算需求,还提供了更快的响应<code>速度</code>.</td><td>更快的响应速度/更短的响应时间</td></tr><tr><td>这为未来央行数字货币[39]以及数字人民币开展金融业务提供了新思路.</td><td>这为未来央行数字货币[39]以及数字人民币的金融应用提供了新思路。</td><td>货币没法开展业务，开展业务的是人</td></tr></tbody></table></div><h2 id="我干了我自己"><a href="#我干了我自己" class="headerlink" title="我干了我自己"></a>我干了我自己</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>基于系统模型和威胁模型,本文从效率、安全性以及可扩展性三个方面定义了本文的设计目标:</td><td>基于系统模型和威胁模型,<code>本节</code>将从效率、安全性以及可扩展性三个方面定义设计目标:</td><td>本文定义了本文的目标？</td></tr></tbody></table></div><h2 id="一件事描述完得用句号"><a href="#一件事描述完得用句号" class="headerlink" title="一件事描述完得用句号"></a>一件事描述完得用句号</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>对称认证加密方案$\varepsilon$需满足正确性要求，对于任意认证密钥…</td><td>对称认证加密方案$\varepsilon$需满足正确性要求<code>。</code>对于任意认证密钥…</td><td>第一句话总领全文，句号就ok</td></tr></tbody></table></div><h2 id="表并列省略主语，不然看着太啰嗦"><a href="#表并列省略主语，不然看着太啰嗦" class="headerlink" title="表并列省略主语，不然看着太啰嗦"></a>表并列省略主语，不然看着太啰嗦</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>对于任意一个概率多项式时间敌手[A],[A]在下述游戏中的优势…</td><td>对于任意一个概率多项式时间敌手[A],在下述游戏中的优势…</td><td>逗号后面的主语可以删掉了</td></tr></tbody></table></div><h2 id="全称-简称要统一"><a href="#全称-简称要统一" class="headerlink" title="全称-简称要统一"></a>全称-简称要统一</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>敌手[A]与挑战者执行游戏…</td><td>敌手[A]与挑战者[C]执行游戏…</td><td>不能敌手有简称挑战者么得</td></tr></tbody></table></div><h2 id="减少长难句"><a href="#减少长难句" class="headerlink" title="减少长难句"></a>减少长难句</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>Alex等人[7]基于不经意传输协议和满足IND-CPA的对称认证加密方案提出的两方公平秘密交换协议可以在不需要任何第三方参与的情况下实现秘密交换,即参与交换的两个秘密要么都会被交换,要么没有一个秘密会被交换.</td><td>Alex等人[7]基于不经意传输协议和满足IND-CPA安全定义的对称认证加密方案,提出了一种两方公平秘密交换协议。该协议可以在没有第三方参与的情况下,实现两方之间的秘密交换.参与交换的两个秘密要么都会被交换,要么没有一个秘密会被交换.</td><td>长难句要拆开</td></tr></tbody></table></div><h2 id="表意不明"><a href="#表意不明" class="headerlink" title="表意不明"></a>表意不明</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>通过以上过程,实现了X和Y之间的秘密公平交换,并且在此过程中无需任何第三方介入,但代价是协议的错误率为$({M-1)}/{M}\;$并且协议最大需要运行M次,如果将协议运行在合约中会造成大量的计算开销</td><td>通过以上<code>步骤</code>,实现了X和Y之间的秘密公平交换,在此过程中无需任何第三方介入<code>.</code>但是该协议的错误率为$({M-1)}/{M}\;$,并且最多需要运行M次,如果在智能合约中执行该协议会造成较大的计算开销.</td><td>连词过多，太乱了</td></tr><tr><td>此外,通过将部分计算移到链下,进一步提高了系统的效率.这不仅减少了链上的计算需求,还提供了更快的响应时间.</td><td>此外,通过将部分计算<code>迁移</code>至链下执行,进一步提高了系统的效率.这不仅减少了链上的<code>计算量</code>,<code>还缩短了</code>响应时间.</td><td>减少口语化描述</td></tr></tbody></table></div><h2 id="标点符号"><a href="#标点符号" class="headerlink" title="标点符号"></a>标点符号</h2><div class="table-container"><table><thead><tr><th>错误</th><th>正确</th><th>原因</th></tr></thead><tbody><tr><td>债权人、债务人和第三方都参与了链上智能合约的交互过程,如果第三方不参与债务转让,则链上合约只执行贷款协议部分,此时债务转让部分不会产生额外的开销;如果第三方参与债务转让,则在债务转让完成后原本债务人与债权人的贷款协议将转变为第三方与债权人的贷款协议,债务人在债务转让完成后不再参与后续的贷款流程.</td><td>债权人、债务人和第三方都参与了链上智能合约的交互过程.如果第三方不参与债务转让,则链上合约只执行贷款协议部分,此时债务转让部分不会产生额外的开销.如果第三方参与债务转让,则在债务转让完成后,原本存在于债务人与债权人之间的贷款协议将转变为第三方与债权人之间的新的贷款协议.在债务转让后,债务人不再参与后续的贷款流程.</td><td>一件事说完，如果要另起一件事就是句号隔开。</td></tr><tr><td>本文参考了Black等人[3]设计的原子贷款协议,基于可升级智能合约的特点设计了可转让原子贷款协议,协议包含三个合约,具体如下:</td><td>本文参考了Black等人[3]设计的原子贷款协议,基于可升级智能合约的特点设计了可转让原子贷款协议<code>.</code>协议包含三个合约,具体如下:</td><td>两件事用句号隔开</td></tr></tbody></table></div><h1 id="英文语法"><a href="#英文语法" class="headerlink" title="英文语法"></a>英文语法</h1><p>未完待续…</p>]]></content>
+    
+    
+    <summary type="html">记录一下论文路上各种奇怪的语法问题，少壮不学习，老来两行泪。</summary>
+    
+    
+    
+    <category term="学习" scheme="https://www.happyshark.cn/categories/%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="语文" scheme="https://www.happyshark.cn/tags/%E8%AF%AD%E6%96%87/"/>
+    
+    <category term="论文" scheme="https://www.happyshark.cn/tags/%E8%AE%BA%E6%96%87/"/>
+    
+    <category term="学习" scheme="https://www.happyshark.cn/tags/%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
   
   <entry>
     <title>群辉container Manager修复思源笔记v2.10.x的accessAuthCode执行命令的错误</title>
@@ -417,27 +442,6 @@
     
     
     <summary type="html">来自老妈&amp;二舅的手艺二合一版，做法可繁可简，味道好极啦</summary>
-    
-    
-    
-    <category term="厨房里的秘密" scheme="https://www.happyshark.cn/categories/%E5%8E%A8%E6%88%BF%E9%87%8C%E7%9A%84%E7%A7%98%E5%AF%86/"/>
-    
-    
-    <category term="家的味道" scheme="https://www.happyshark.cn/tags/%E5%AE%B6%E7%9A%84%E5%91%B3%E9%81%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>红烧虾</title>
-    <link href="https://www.happyshark.cn/2022/02/09/%E7%BA%A2%E7%83%A7%E8%99%BE/"/>
-    <id>https://www.happyshark.cn/2022/02/09/%E7%BA%A2%E7%83%A7%E8%99%BE/</id>
-    <published>2022-02-09T04:00:00.000Z</published>
-    <updated>2022-02-09T04:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<hr><ol><li><p>调汁儿：小葱 料酒 姜 鸡精 耗油 生抽 酱油</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210121235203.png" alt="image-20220210121235203"></p></li><li><p>锅放油，倒虾，炒制变色，放汁</p><p>-<img src="https://blogimages.happyshark.cn//food/image-20220210121258320.png" alt="image-20220210121258320"></p></li><li><p>放水大火收汁，不用盖锅盖，最后放鸡精调味出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210121406157.png" alt="image-20220210121406157"></p></li></ol>]]></content>
-    
-    
-    <summary type="html">今天开始学做虾</summary>
     
     
     
