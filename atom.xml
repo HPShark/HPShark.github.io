@@ -6,7 +6,7 @@
   <link href="https://www.happyshark.cn/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2023-10-25T14:00:00.000Z</updated>
+  <updated>2024-05-27T16:00:00.000Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>windows部署ubuntu wsl2子系统并调用windows GPU</title>
+    <link href="https://www.happyshark.cn/2024/05/28/windows%E9%83%A8%E7%BD%B2ubuntu%20wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows%20GPU/"/>
+    <id>https://www.happyshark.cn/2024/05/28/windows%E9%83%A8%E7%BD%B2ubuntu%20wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows%20GPU/</id>
+    <published>2024-05-27T16:00:00.000Z</published>
+    <updated>2024-05-27T16:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr><hr><p>最近天天想跑一下github上的热门repo，实验室的电脑太少了导致不得不充分利用一下工位上的windwos电脑，把windows部署docker并跑wsl2调GPU的过程总结一下~</p><h1 id="安装前提"><a href="#安装前提" class="headerlink" title="安装前提"></a>安装前提</h1><ul><li>需要win10 22H2或win11 pro以上的版本</li><li>需要将nvidia更新为最新的驱动</li></ul><h1 id="安装docker-desktop"><a href="#安装docker-desktop" class="headerlink" title="安装docker desktop"></a>安装docker desktop</h1><ol><li><p>Docker下载地址：<a href="https://www.docker.com/get-started/">docker官网下载地址</a><br><img src="https://blogimages.happyshark.cn/windows部署ubuntu-wsl2子系统并调用windows-GPU/aa5fd0b0411b470693b3dc2ce03aa54c.png" alt="在这里插入图片描述"></p></li><li><p>启用hyper-v：<a href="https://docs.microsoft.com/zh-cn/virtualization/hyper-v-on-windows/quick-start/enable-hyper-v">微软教程官网</a>。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/68169e17ba0849f8bedfd760ab4598c0.png" alt="在这里插入图片描述"></p><p><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/41e7a15adce54a278dc9148f24d59f5b.png" alt="在这里插入图片描述"><br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/c32129b0a7e54b45b10b6935135be218.png" alt="在这里插入图片描述"></p></li><li><p>Shift + Ctrl + ESC 启动任务管理器，查看<code>性能-虚拟化</code>是否启用。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/fec8ecc8d51442e9b38eae0f10c1e975.png" alt="在这里插入图片描述"></p></li><li><p>安装docker<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528162625523.png" alt="image-20240528162625523"></p><blockquote><p>如果需要配置docker镜像加速，推荐阿里云：<a href="https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors">容器镜像服务 (aliyun.com)</a></p></blockquote></li></ol><h1 id="安装wsl2"><a href="#安装wsl2" class="headerlink" title="安装wsl2"></a>安装wsl2</h1><h2 id="执行以下命令-将wsl升级为wsl2："><a href="#执行以下命令-将wsl升级为wsl2：" class="headerlink" title="执行以下命令, 将wsl升级为wsl2："></a>执行以下命令, 将wsl升级为wsl2：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wsl --update</span><br><span class="line">wsl --set-default-version 2</span><br></pre></td></tr></table></figure><p>执行以下命令确认版本均为2：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl -l -v </span><br></pre></td></tr></table></figure></p><p><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528172427389.png" alt="image-20240528172427389"></p><h2 id="安装linux子系统"><a href="#安装linux子系统" class="headerlink" title="安装linux子系统"></a>安装linux子系统</h2><ol><li>打开微软商店。搜索【Ubuntu】或【linux】都可以，安装tls长期支持版即可。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528172610644.png" alt="image-20240528172610644"></li><li>打开子系统并进行配置<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/8d2f32885cd440d1a9f7d0f2249adb41.png" alt="在这里插入图片描述"></li><li>设置默认使用root登录<br>管理员权限打开【powershell】<br>运行：<code>ubuntu2004.exe config --default-user root</code><br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/22ec365c2e3a49eb863f94f6613f52d0.png" alt="在这里插入图片描述"><br>然后再打开的时候就可以看到默认登录用户为【root】。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/e6ac5e1e64c348ad9d2b0d42345bb255.png" alt="在这里插入图片描述"></li><li>将Ubuntu2004设置为默认wsl，执行<code>wslconfig /setdefault Ubuntu-20.04</code><br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528203453444.png" alt="image-20240528203453444"></li><li>docker配置ubuntu20.04 LTS<br><img src="https://blogimages.happyshark.cn/windows部署ubuntu-wsl2子系统并调用windows-GPU/9f6b7a93620c42dca28b80019e3e31f0.png" alt="在这里插入图片描述"><br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/0bfebde60dc14a579cf621bce9d6bef2.png" alt="在这里插入图片描述"></li></ol><h1 id="配置桥接"><a href="#配置桥接" class="headerlink" title="配置桥接"></a>配置桥接</h1><p>因为有局域网访问的需求，如果使用nat模式会很不方便，故直接将wsl桥接。</p><ol><li><p>首先运行wsl2（这样才能出现WSL的虚拟网卡），以管理员方式打开powershell，执行<code>Get-NetAdapter</code>，可以列出系统所有的网卡，记住想要桥接的网卡名称，比如我想桥接到有线网络其名称为“以太网”。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528173225631.png" alt="image-20240528173225631"></p></li><li><p>执行<code>Set-VMSwitch WSL -NetAdapterName 以太网</code>命令，完成网卡桥接</p></li><li><p>打开ubuntu2004，执行以下代码，完成ipv4静态配置：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo ip addr del $(ip addr show eth0 | grep &#x27;inet\b&#x27; | awk &#x27;&#123;print $2&#125;&#x27; | head -n 1) dev eth0</span><br><span class="line">sudo ip addr add 192.168.6.160/24 broadcast 192.168.6.255 dev eth0</span><br><span class="line">sudo ip route add 0.0.0.0/0 via 192.168.6.1 dev eth0</span><br></pre></td></tr></table></figure><blockquote><p>192.168.6.160为指定的ip地址</p><p>192.168.6.255为广播地址</p><p>192.168.6.1为路由网关地址</p></blockquote></li><li><p>ubuntu子系统运行ifconfig，检查ip是否成功修改，并使用其他电脑ping检查是否ping通。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528173704451.png" alt="image-20240528173704451">可以看到路由器已经检测到wsl<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528173741444.png" alt="image-20240528173741444"></p></li></ol><h1 id="GPU的使用"><a href="#GPU的使用" class="headerlink" title="GPU的使用"></a>GPU的使用</h1><ol><li><p>请确保打开开发人员模式</p><p><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240529091738047.png" alt="image-20240529091738047"></p></li><li><p>windows更新到最新版本，并开启可选更新<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240529091903162.png" alt="image-20240529091903162"><br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240529091937321.png" alt="image-20240529091937321"></p></li><li><p>显卡驱动下载<br>首先需要安装显卡驱动，<a href="https://www.nvidia.cn/Download/index.aspx?lang=cn">NVIDIA官网下载地址</a>。<br>找到自己的显卡型号下载安装即可。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528174134569.png" alt="image-20240528174134569"></p></li><li><p>CUDA For WSL<br>驱动下载：<a href="https://docs.microsoft.com/zh-cn/windows/ai/directml/gpu-cuda-in-wsl">NVIDIA官网文档</a>，找到对应版本下载安装即可。<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240528174213939.png" alt="image-20240528174213939"></p></li><li><p>在Ubuntu中安装cuda toolkit<br><a href="https://developer.nvidia.com/cuda-toolkit-archive">CUDA Toolkit Archive | NVIDIA Developer</a>在这里找对应的版本，选择x86_64 ws-ubuntu系统选择对应的安装方式即可。</p></li><li><p>配置权限</p><p>完成第三步后如果用root账户登录直接置执行<code>nvidia-smi</code>可以正常使用cuda，但是用普通账户会报错<code>Command &#39;nvidia-smi&#39; not found, but can be installed with:xxx</code>，如果需要用普通账户访问需要还需要配置权限，执行以下梁行代码：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/lib/wsl/lib/nvidia-smi /usr/bin/nvidia-smi</span><br><span class="line">chmod ogu+x /usr/bin/nvidia-smi</span><br></pre></td></tr></table></figure><p>然后在执行<code>nvidia-smi</code>配置成功~<br><img src="https://blogimages.happyshark.cn/windows%E9%83%A8%E7%BD%B2ubuntu-wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows-GPU/image-20240529091424235.png" alt="image-20240529091424235"></p></li></ol>]]></content>
+    
+    
+    <summary type="html">想用windows正常办公，又想用Ubuntu部署docker然后调用gpu，比来比去wsl2应该是最优解了</summary>
+    
+    
+    
+    <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="docker" scheme="https://www.happyshark.cn/tags/docker/"/>
+    
+    <category term="wsl2" scheme="https://www.happyshark.cn/tags/wsl2/"/>
+    
+    <category term="nvidia-smi" scheme="https://www.happyshark.cn/tags/nvidia-smi/"/>
+    
+  </entry>
   
   <entry>
     <title>语法大学习</title>
@@ -58,9 +83,9 @@
     <category term="实验室大杂烩" scheme="https://www.happyshark.cn/categories/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%A4%A7%E6%9D%82%E7%83%A9/"/>
     
     
-    <category term="群晖" scheme="https://www.happyshark.cn/tags/%E7%BE%A4%E6%99%96/"/>
-    
     <category term="docker" scheme="https://www.happyshark.cn/tags/docker/"/>
+    
+    <category term="群晖" scheme="https://www.happyshark.cn/tags/%E7%BE%A4%E6%99%96/"/>
     
   </entry>
   
@@ -421,27 +446,6 @@
     
     
     <summary type="html">年夜饭c位佳肴，全家吃了都说好</summary>
-    
-    
-    
-    <category term="厨房里的秘密" scheme="https://www.happyshark.cn/categories/%E5%8E%A8%E6%88%BF%E9%87%8C%E7%9A%84%E7%A7%98%E5%AF%86/"/>
-    
-    
-    <category term="家的味道" scheme="https://www.happyshark.cn/tags/%E5%AE%B6%E7%9A%84%E5%91%B3%E9%81%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>紫菜蛋花汤</title>
-    <link href="https://www.happyshark.cn/2022/02/09/%E7%B4%AB%E8%8F%9C%E8%9B%8B%E8%8A%B1%E6%B1%A4/"/>
-    <id>https://www.happyshark.cn/2022/02/09/%E7%B4%AB%E8%8F%9C%E8%9B%8B%E8%8A%B1%E6%B1%A4/</id>
-    <published>2022-02-09T04:00:00.000Z</published>
-    <updated>2022-02-09T04:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<hr><ol><li><p>锅里加水，可选放一些虾皮一起煮等，水开</p></li><li><p>水开了之后改中火，放番茄丁（番茄也可以） 紫菜，盐，可选胡椒粉（调辣） ，淀粉（调粘稠度），耗油（调鲜调味）<br><img src="https://blogimages.happyshark.cn/food/image-20220212133040186.png" alt="image-20220212133040186"></p></li><li><p>打蛋花，对着冒泡的地方慢慢往里滴<br><img src="https://blogimages.happyshark.cn/food/image-20220212133107802.png" alt="image-20220212133107802"></p></li><li><p>放菠菜（菠菜第二步放也可以，量大的话推荐最后一步放菠菜，因为菠菜煮时间长容易老），浮起来放香油，可选鸡精和味精，煮一会就可以出锅啦<br><img src="https://blogimages.happyshark.cn/food/image-20220212133136839.png" alt="image-20220212133136839"></p></li></ol>]]></content>
-    
-    
-    <summary type="html">来自老妈&amp;二舅的手艺二合一版，做法可繁可简，味道好极啦</summary>
     
     
     
