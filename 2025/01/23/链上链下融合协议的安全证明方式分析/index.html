@@ -1,0 +1,693 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>链上链下融合协议的安全证明方式分析 | Happy Shark</title><meta name="author" content="HPShark"><meta name="copyright" content="HPShark"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="2025年可证明安全理论课程的课程大作业，撰写的时候感觉对整个安全证明理论的背景、方式有了更深入的了解，放在这里供以后的入门新人阅读啦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="链上链下融合协议的安全证明方式分析">
+<meta property="og:url" content="https://www.happyshark.cn/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Happy Shark">
+<meta property="og:description" content="2025年可证明安全理论课程的课程大作业，撰写的时候感觉对整个安全证明理论的背景、方式有了更深入的了解，放在这里供以后的入门新人阅读啦">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png">
+<meta property="article:published_time" content="2025-01-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-22T16:00:00.000Z">
+<meta property="article:author" content="HPShark">
+<meta property="article:tag" content="安全规约">
+<meta property="article:tag" content="安全证明">
+<meta property="article:tag" content="链上链下融合">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png"><link rel="shortcut icon" href="https://blogimages.happyshark.cn/hexo/favicon.ico"><link rel="canonical" href="https://www.happyshark.cn/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/index.html"><link rel="preconnect" href="//cdnjs.cloudflare.com"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="9vVi06K024u7LLF-6lX2_RXCGcQqtDxtcmacxWGeZhM"/><meta name="baidu-site-verification" content="SoQqqYx4asw1Hjo3"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5fb1b716f40cab42e95bf5d2d279dd42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-116830180-1"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-116830180-1');
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"这篇文章发布于","messageNext":"天之前，文章中的部分内容可能会过期。"},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdnjs.cloudflare.com/ajax/libs/egjs-infinitegrid/4.10.1/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '链上链下融合协议的安全证明方式分析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-23 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Happy Shark" type="application/atom+xml">
+</head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="https://www.unpkg.com/pace-js@latest/pace-theme-default.min.css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Happy Shark"><span class="site-name">Happy Shark</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">链上链下融合协议的安全证明方式分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-22T16:00:00.000Z" title="发表于 2025-01-23 00:00:00">2025-01-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-01-22T16:00:00.000Z" title="更新于 2022-01-23 00:00:00">2022-01-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6/">密码学</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">9.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>30分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="链上链下融合协议的安全证明方式分析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><hr>
+<p>在区块链应用的迅猛发展背景下，链上与链下融合协议的安全性日益受到关注。可证明安全理论为我们提供了一套系统的方法来分析协议在不同模型下的安全保证，从而在设计阶段就可针对潜在威胁进行防御。本报告针对“链上链下融合协议的安全证明方式”展开，首先介绍可证明安全理论的基本概念与发展背景，然后总结常见的安全协议规约与证明方法，接着聚焦于链上协议在威胁模型与安全防护方面的关键思路，以期为相关协议设计与安全分析提供参考。</p>
+<h1 id="可证明安全理论概述"><a href="#可证明安全理论概述" class="headerlink" title="可证明安全理论概述"></a>可证明安全理论概述</h1><h2 id="可证明安全的定义与背景"><a href="#可证明安全的定义与背景" class="headerlink" title="可证明安全的定义与背景"></a>可证明安全的定义与背景</h2><h3 id="可证明安全的定义"><a href="#可证明安全的定义" class="headerlink" title="可证明安全的定义"></a>可证明安全的定义</h3><p>“可证明安全（Provable Security）”通常指的是在严格的数学假设或模型下，通过形式化的推导或归约论证来确保密码学协议或机制具备一定的安全性保证[1]。与经验性或启发式的安全分析不同，可证明安全要求将协议或算法的安全性归约到一个或多个被普遍接受的难题或复杂性假设之上。例如，若某协议的安全能被归约到离散对数问题（Discrete Logarithm Problem）不可求解这一假设，那么在该假设成立的前提下，我们就能证明协议满足指定的安全属性[2]。</p>
+<h3 id="可证明安全的发展背景"><a href="#可证明安全的发展背景" class="headerlink" title="可证明安全的发展背景"></a>可证明安全的发展背景</h3><p><strong>密码学理论的演进</strong>：从最初的对称加密（如DES、AES）到公钥密码（如RSA、ECC），学术界逐渐意识到仅凭直觉或简单测试无法证明某一机制的安全性。为了解决“如何在形式化层面论证安全性”的问题，诞生了可证明安全理论[3]。</p>
+<p><strong>关键的研究里程碑</strong>：1976年Diffie和Hellman提出公钥加密思想[4]，拉开了现代密码学的序幕；1984年ElGamal提出基于离散对数难题的公钥加密方案[5]；1985年RSA被形式化地纳入可证明安全研究的范畴；随后Goldwasser和Micali等人将复杂性理论与密码学相结合，为可证明安全奠定了坚实基础[6]。</p>
+<p><strong>从传统到现代</strong>：进入21世纪后，可证明安全研究快速拓展到多方安全计算、同态加密、零知识证明等领域[7]，并在区块链应用中进一步得到关注和实践。</p>
+<h3 id="研究意义"><a href="#研究意义" class="headerlink" title="研究意义"></a>研究意义</h3><p>可证明安全方法帮助设计者在协议部署前就能量化其在特定威胁模型下的风险，从而降低实际应用中的安全漏洞或隐患[8]。这对于构建信任基础薄弱、参与方众多的分布式系统尤其重要。在金融、物联网、区块链等高风险领域，可证明安全已经成为协议设计和审计的“标准配置”[9]。</p>
+<h2 id="常见的可证明安全方法"><a href="#常见的可证明安全方法" class="headerlink" title="常见的可证明安全方法"></a>常见的可证明安全方法</h2><p>卧龙岗大学的郭福春老师[10]在Bilibili网站上开设密码学课程[11]，详细介绍了安全规约的方法，本节以郭老师的内容为基础，对常见的可证明安全的方法做一个总结。</p>
+<h3 id="基于复杂性假设的可证明安全"><a href="#基于复杂性假设的可证明安全" class="headerlink" title="基于复杂性假设的可证明安全"></a>基于复杂性假设的可证明安全</h3><p>常见的复杂性假设包括如大数分解难题、离散对数难题、椭圆曲线离散对数难题等[2]，其安全规约思路和特点如下：</p>
+<p>安全归约思路：如果能够证明“破解协议”比“解决某著名难题”更难或同等困难，则可在相应假设有效的前提下认定协议安全[12]。</p>
+<p>特点：此方法直观易懂，且在已有的复杂性理论及大量实验验证的支持下，能为协议安全性提供较高说服力。</p>
+<h3 id="基于随机预言机模型（Random-Oracle-Model，ROM）"><a href="#基于随机预言机模型（Random-Oracle-Model，ROM）" class="headerlink" title="基于随机预言机模型（Random Oracle Model，ROM）"></a>基于随机预言机模型（Random Oracle Model，ROM）</h3><p><strong>定义</strong>：将哈希函数抽象为真正的随机函数，攻击者无法对其进行结构性分析[13]。</p>
+<p><strong>典型应用</strong>：Fiat-Shamir变换、许多签名方案和密钥交换协议均在随机预言机模型下得到简单且有效的安全证明[14]。</p>
+<p><strong>局限性</strong>：随机预言机模型存在与实际哈希函数并不完全相符的风险；在标准模型中，随机预言机是假设的理想组件，并不能直接映射到现实世界[15]。</p>
+<h3 id="基于标准模型（Standard-Model）的可证明安全"><a href="#基于标准模型（Standard-Model）的可证明安全" class="headerlink" title="基于标准模型（Standard Model）的可证明安全"></a>基于标准模型（Standard Model）的可证明安全</h3><p><strong>定义</strong>：不使用随机预言机等理想化假设，而是直接基于复杂性理论进行证明[12]。</p>
+<p><strong>优点</strong>：证明结果更为严格，通常被视为“最能贴近真实环境”的安全保证[16]。</p>
+<p><strong>挑战</strong>：证明难度大，往往需要构造更精巧的归约和大量的辅助结构，一些本在ROM下易于证明的协议，在标准模型下可能需要额外的技巧或修改[17]。</p>
+<h2 id="可证明安全在区块链领域的地位"><a href="#可证明安全在区块链领域的地位" class="headerlink" title="可证明安全在区块链领域的地位"></a>可证明安全在区块链领域的地位</h2><h3 id="区块链对安全的特殊需求"><a href="#区块链对安全的特殊需求" class="headerlink" title="区块链对安全的特殊需求"></a>区块链对安全的特殊需求</h3><p>区块链是一个去中心化的分布式账本系统，通过共识算法和加密技术实现多方协作。其核心安全目标包括：</p>
+<p><strong>数据不可篡改</strong>：交易记录一旦写入区块，不可逆转性对安全协议提出严格要求[18]。</p>
+<p><strong>去中心化信任</strong>：无需中心信任机构，但需在协议层面保证各方按规则行事[19]。</p>
+<p><strong>多方协作与高交互性</strong>：区块链上的操作往往涉及多方参与，如跨链互操作性、链上链下数据交换等场景，对协议安全性提出更高要求[20]。</p>
+<h3 id="可证明安全在智能合约与链上协议设计中的意义"><a href="#可证明安全在智能合约与链上协议设计中的意义" class="headerlink" title="可证明安全在智能合约与链上协议设计中的意义"></a>可证明安全在智能合约与链上协议设计中的意义</h3><p><strong>事前防御</strong>：在智能合约或链上协议上线之前，利用可证明安全模型进行推演和归约，能有效避免常见漏洞与攻击场景[21]。</p>
+<p><strong>审计与合规</strong>：在金融、供应链、物联网等领域，安全合规成为必要条件，可证明安全提供了可量化和可验证的合规依据[22]。</p>
+<p><strong>促进技术进化</strong>：在零知识证明、多方安全计算（MPC）等新兴方向中，区块链应用尤为广泛，借助可证明安全的理念和工具，可推动这些新技术快速成熟[23]。</p>
+<h3 id="典型实践案例"><a href="#典型实践案例" class="headerlink" title="典型实践案例"></a>典型实践案例</h3><p><strong>比特币与UTXO</strong>模型**：比特币脚本语言非常简洁，其安全性设计可被部分规约至哈希碰撞难题和椭圆曲线签名的安全性[24]。</p>
+<p><strong>以太坊智能合约</strong>：大量去中心化应用（DApps）在以太坊上运行，智能合约在部署前多采用形式化验证与可证明安全分析工具进行审计[25]。</p>
+<p><strong>跨链与侧链方案</strong>：在跨链通信时，通常需要Merkle证明或零知识证明（ZKP）机制来。</p>
+<h1 id="链下安全协议的证明方法"><a href="#链下安全协议的证明方法" class="headerlink" title="链下安全协议的证明方法"></a>链下安全协议的证明方法</h1><p>在对一个安全协议进行分析或证明之前，必须先“规约”该协议，也即对其进行形式化或半形式化的描述，包括协议交互流程、角色和安全属性等。完善而准确的规约不仅有助于后续的安全模型构建，也为安全证明提供了明确的分析起点。</p>
+<h2 id="常见安全协议的规约方式"><a href="#常见安全协议的规约方式" class="headerlink" title="常见安全协议的规约方式"></a>常见安全协议的规约方式</h2><p>本节从协议语义与流程描述、协议所需满足的安全特性，以及常见的形式化方法与工具三个方面进行阐述。</p>
+<h3 id="协议语义与流程描述"><a href="#协议语义与流程描述" class="headerlink" title="协议语义与流程描述"></a>协议语义与流程描述</h3><h4 id="协议语义的内涵"><a href="#协议语义的内涵" class="headerlink" title="协议语义的内涵"></a>协议语义的内涵</h4><p>协议语义是指在安全通信或交互过程中，各个角色（如客户端、服务器、第三方）所发送或接收的消息类型、内容及顺序[26]。只有先明确各步骤的具体含义，才能进一步讨论协议在何种假设下能够保持安全性质，也才能有效地评估其在面对潜在攻击时的行为。</p>
+<h4 id="流程描述的常见方式"><a href="#流程描述的常见方式" class="headerlink" title="流程描述的常见方式"></a>流程描述的常见方式</h4><p><strong>消息序列图（Message Sequence Chart</strong>）**：通过可视化的时序图展示协议中各参与方之间的消息交换顺序、消息内容以及条件判断。这样的图解方法直观、易于理解，适合在初期沟通或教学场景中使用。</p>
+<p><strong>过程语言（Process Calculus</strong>）**：例如π演算（pi-calculus）或其扩展形式Applied π Calculus，这些形式化语言提供了严谨的语法规则和推理规则，让研究者能对协议流程进行系统建模，并支持自动化或半自动化的工具验证[27]。</p>
+<p><strong>伪代码/</strong>操作描述**：以接近编程语言的方式直接描述协议中每一步的输入、输出和条件分支，实现者可依此快速理解并编写对应的程序或智能合约逻辑。</p>
+<h4 id="协议语义描述要点"><a href="#协议语义描述要点" class="headerlink" title="协议语义描述要点"></a>协议语义描述要点</h4><p><strong>参与方角色定义</strong>：明确协议中哪些实体（人、设备、节点）参与交互，以及每个角色的功能和权限。</p>
+<p><strong>消息格式与编码</strong>：规定消息中包含哪些字段（如时间戳、随机数、签名值等），以及如何进行编码和解码（例如ASN。1、JSON或自定义格式）。</p>
+<p><strong>交互顺序与条件</strong>：清晰标明协议执行时的先后顺序、条件判断以及异常处理流程（如超时、消息丢失或校验失败时该如何处理）。</p>
+<h3 id="安全特性的定义"><a href="#安全特性的定义" class="headerlink" title="安全特性的定义"></a>安全特性的定义</h3><p>不同场景下的协议对安全的要求并不相同：有的协议更关注机密性（确保信息不被窃听），有的则更加注重完整性（保证消息不被篡改），也有的强调匿名性（隐藏通信双方的真实身份）。如果没有在协议规约阶段做好安全特性定义，就无法针对性地评估或证明协议能否满足这些需求。</p>
+<p>常见安全属性</p>
+<p>（1）保密性（Confidentiality）：协议应保证未经授权的实体无法获取敏感信息。</p>
+<p>（2）完整性（Integrity）：数据传输或存储期间不被篡改或伪造，或若发生篡改能被及时检测。</p>
+<p>（3）身份认证（Authentication）：各参与方应能证明自己的身份，防止冒充或假冒行为。</p>
+<p>（4）不可抵赖性（Non-repudiation）：协议执行后，发送方不能否认自己曾发送过某条消息，接收方也不能否认自己已接收。</p>
+<p>（5）匿名性（Anonymity）或隐私（Privacy）：在某些场景下，需要隐藏通信双方的真实身份或交易细节。</p>
+<p>（6）可用性（Availability）：协议在面对拒绝服务攻击或资源消耗攻击时，依然能维持必要的功能。</p>
+<p>属性间的潜在冲突</p>
+<p>在实际系统中，不同安全属性间可能出现权衡或冲突：</p>
+<p>（1）隐私与审计冲突：为了便于审计或监管，往往需要对通信进行记录；这在一定程度上会影响匿名性或隐私。</p>
+<p>（2）不可抵赖性与用户体验冲突：为实现不可抵赖性，可能需要增加数字签名、时间戳等操作，导致用户体验变差或协议实现更复杂。</p>
+<p>（3）安全与性能冲突：频繁的加密或签名操作、额外的安全验证步骤，都会带来性能上的开销，需要在安全与效率之间做平衡。</p>
+<h3 id="形式化方法与工具"><a href="#形式化方法与工具" class="headerlink" title="形式化方法与工具"></a>形式化方法与工具</h3><p>人工分析在面对复杂协议时易出现遗漏和误判，而形式化方法借助数学模型或符号推理的严谨性，有助于覆盖更多攻击路径并减少主观失误[28]。</p>
+<h4 id="典型形式化工具"><a href="#典型形式化工具" class="headerlink" title="典型形式化工具"></a>典型形式化工具</h4><p><strong>ProVerif</strong>：基于Applied π Calculus的自动化分析工具，能检测包括保密性、认证性在内的多种安全属性。</p>
+<p><strong>Tamarin</strong>：擅长分析协议在多种攻击场景下的复杂属性，如多重身份认证、组合攻击等，更适合研究分布式或多方安全性。</p>
+<p><strong>CryptoVerif</strong>：使用复杂性理论进行可证明安全分析，能够在给定的复杂性假设下输出形式化的安全保证。</p>
+<p><strong>AVISPA</strong>：具备多种后端工具（如 OFMC、CL-AtSe 等），适合对Internet协议（如IPSec、TLS）进行快速验证。</p>
+<h4 id="工具使用的局限与建议"><a href="#工具使用的局限与建议" class="headerlink" title="工具使用的局限与建议"></a>工具使用的局限与建议</h4><p><strong>状态空间爆炸</strong>：随着协议规模和状态数增多，自动化工具可能面临计算量急剧膨胀的难题。</p>
+<p><strong>建模抽象</strong>：形式化建模需要合理的抽象，过于简化会导致分析结果与现实脱节，过于精细又会导致模型过度复杂、难以分析。</p>
+<p><strong>与实现结合</strong>：在工具验证完成后，实际代码实现环节中若存在新的漏洞（如编程错误或配置错误），依旧可能破坏协议原本的安全</p>
+<h2 id="安全模型"><a href="#安全模型" class="headerlink" title="安全模型"></a>安全模型</h2><p>在完成协议的基本规约后，需要根据实际应用场景与安全需求构建相应的“安全模型”。该模型描述了系统中的通信方式、攻击者能力以及系统假设等关键要素。只有在一个合理、完备的模型下进行安全分析或证明，才能确保所得结论对真实环境有针对性和指导价值。</p>
+<h3 id="通信模型"><a href="#通信模型" class="headerlink" title="通信模型"></a>通信模型</h3><h4 id="同步与异步"><a href="#同步与异步" class="headerlink" title="同步与异步"></a>同步与异步</h4><p><strong>同步通信</strong>：假设所有消息都在既定时限内完成传输，且系统能够检测并处理迟到或丢失消息。这类假设有助于简化协议分析，但往往不够贴近现实的网络情况。</p>
+<p><strong>异步通信</strong>：在真实互联网中，各节点的消息传输往往存在延迟、丢包等现象，协议必须考虑这些不确定性。异步模型下，对去中心化系统的安全性分析更具现实意义，但形式化证明也更复杂。</p>
+<h4 id="点对点与广播"><a href="#点对点与广播" class="headerlink" title="点对点与广播"></a>点对点与广播</h4><p><strong>点对点</strong>：典型的客户端-服务器模式或一对一通信模式，安全分析中更关注两方间的秘密交换与身份认证。</p>
+<p><strong>广播</strong>：在多方参与或分布式系统（如区块链）中，广播通信是核心特性，需要评估篡改广播、重放广播、以及网络分区等情形下的安全性。</p>
+<h4 id="可信第三方（TTP）的存在与否"><a href="#可信第三方（TTP）的存在与否" class="headerlink" title="可信第三方（TTP）的存在与否"></a>可信第三方（TTP）的存在与否</h4><p><strong>有TTP</strong>：如果系统中有被所有方公认可信的第三方，可以帮助完成仲裁、时间戳签发、密钥管理等操作，协议设计可能更简单。</p>
+<p><strong>无TTP</strong>：若系统要在完全去中心化模式下运行，就需要使用共识算法、多方安全计算等技术来替代传统第三方的职能，但安全分析也更加复杂。</p>
+<h3 id="攻击者模型"><a href="#攻击者模型" class="headerlink" title="攻击者模型"></a>攻击者模型</h3><p><strong>被动攻击者（Passive Adversary</strong>）：仅能窃听或记录通信，但无法篡改或伪造消息。针对被动攻击者，协议主要需要确保保密性和不可识别性（若需要匿名）。</p>
+<p><strong>主动攻击者（Active Adversary</strong>）：可以篡改、伪造、拦截消息，甚至在某些情况下能够移除或重放特定消息。在区块链场景中，还需考虑矿工或节点本身作为主动攻击者时可能发起的分叉攻击或双花攻击。</p>
+<p><strong>适应性攻击者（Adaptive Adversary</strong>）：具备动态调整攻击策略的能力，能够随着协议执行过程的进展，进行针对性攻击。对多方安全计算或链上智能合约来说，适应性攻击模型通常被视为最具威胁的场景之一。</p>
+<p><strong>内生攻击者（Insider Attacker</strong>）：在系统内部拥有合法身份和权限，但实际上具备恶意行为。例如，在联盟链或企业内部系统中，拥有管理员权限的攻击者可能利用特权窃取或篡改关键数据。相应协议需要对内部滥用行为进行限制与审计。</p>
+<h3 id="系统假设与信任环境"><a href="#系统假设与信任环境" class="headerlink" title="系统假设与信任环境"></a>系统假设与信任环境</h3><p><strong>密码学算法假设：</strong>例如，假设哈希函数满足碰撞难以发生、离散对数难题无解或大数分解难度足够高等。只有在这些复杂性假设成立的前提下，才能推导出协议的可证明安全性。</p>
+<p><strong>硬件环境与操作系统假设：</strong>某些协议可能依赖于安全硬件模块（如TPM、HSM）或受信任执行环境（如Intel SGX）来存储和处理敏感信息。如果硬件本身存在安全漏洞，则协议的整体安全性就会受到影响。</p>
+<p><strong>实现层面与外围系统依赖</strong>网络传输层的TLS/SSL安全性、服务器操作系统或智能合约平台是否存在已知漏洞、第三方：库是否安全等，都是可能破坏协议安全的外部因素。因此，需在安全模型中对外围系统做适度的风险评估和防护。</p>
+<p><strong>信任域划分与管理：</strong>不同模块或不同参与方可以被分配到不同的信任级别：例如，数据库管理员仅可访问明文，但无法更改加密策略；智能合约执行环境是公开的，但核心的密钥管理模块是私有的。这种划分能帮助更细粒度地进行安全分析。</p>
+<h2 id="安全证明"><a href="#安全证明" class="headerlink" title="安全证明"></a>安全证明</h2><p>完成协议规约与安全模型构建后，接下来就是核心的“安全证明”环节。安全证明的目标在于：在所设定的模型和假设下，论证协议能抵御何种类型的攻击或满足哪些安全属性。本节将从模拟范式、归约证明以及工具辅助验证三个方面展开。</p>
+<h3 id="模拟范式（Simulation-Paradigm）"><a href="#模拟范式（Simulation-Paradigm）" class="headerlink" title="模拟范式（Simulation Paradigm）"></a>模拟范式（Simulation Paradigm）</h3><p>模拟范式广泛用于多方安全计算（MPC）、零知识证明（ZKP）以及通用组合安全（UC）框架等领域。其主要思路是：构造一个模拟器（Simulator），在不知真实机密的情况下，生成与真实协议执行“不可区分”的交互输出。如果攻击者在模拟环境中无法获取更多的信息，则说明协议在该模型下是安全的。</p>
+<h4 id="关键概念"><a href="#关键概念" class="headerlink" title="关键概念"></a>关键概念</h4><p><strong>模拟器（Simulator</strong>）：扮演所有诚实方或特定角色，以伪造或生成看似“合法”的通信记录，让攻击者无法察觉差异。</p>
+<p><strong>判别器（Distinguisher</strong>）：攻击者尝试区分模拟环境与真实环境，如果区分概率微不足道（可忽略），则协议可被视为安全。</p>
+<p><strong>通用组合性（Universal Composability</strong>，UC<strong>）</strong>：Canetti提出的UC框架允许把一个安全协议作为“构件”组合到更大的系统中，只要各协议都满足UC安全定义，组合后仍能保持安全。</p>
+<h4 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h4><p><strong>优点</strong>：该范式直观地反映了攻击者在协议执行中的信息获取情况；若在模拟环境中攻击者无法取得优势，在真实环境中也无法取得优势。</p>
+<p><strong>缺点</strong>：构造模拟器往往较为复杂，需要深入考虑协议各步骤的可见性、随机性以及对攻击者的限制；某些复杂场景的模拟证明会相当冗长。</p>
+<h3 id="归约证明（Reduction）"><a href="#归约证明（Reduction）" class="headerlink" title="归约证明（Reduction）"></a>归约证明（Reduction）</h3><p>将“破坏协议”这件事与“解决某个公认的复杂难题”相挂钩。如果假设有一个敌手能在合理时间内破坏协议，那么就能用它来高效率地解决这个复杂难题，从而与难题“难解”这一假设产生矛盾。这样，就能证明协议安全性建立在该复杂难题的不可解之上。</p>
+<h4 id="常见复杂难题"><a href="#常见复杂难题" class="headerlink" title="常见复杂难题"></a>常见复杂难题</h4><p><strong>离散对数问题（Discrete Logarithm Problem</strong>）：给定$g^x mod p$ 和$g$ ，求出$x$被认为在多项式时间内不可行。</p>
+<p><strong>大整数分解问题（Integer Factorization Problem</strong>）：寻找大整数的因数分解在现有算法和硬件条件下极其困难。</p>
+<p><strong>基于格的难题（Lattice-based Problems</strong>）：如短向量问题（Shortest Vector Problem，SVP）、近似最短向量问题（Approx-SVP）等，被视为抗量子密码学的重要候选。</p>
+<h4 id="归约证明的构造技巧"><a href="#归约证明的构造技巧" class="headerlink" title="归约证明的构造技巧"></a>归约证明的构造技巧</h4><p><strong>伪装“</strong>敌手”<strong>为子例程</strong>：在归约过程中，把“假设存在的攻击者”当作一个可以接受输入并输出结果的黑盒程序，通过调用它来完成对难题的求解。</p>
+<p><strong>保持机密性与随机性</strong>：需仔细设计协议中的随机数和密钥生成方式，确保在归约构造中不会暴露可被敌手利用的弱点。</p>
+<p><strong>复杂度分析</strong>：证明过程需指出，如果攻击者能在多项式时间内破坏协议，那么就能在相似或更短的多项式时间内解决难题，从而达成矛盾。</p>
+<h4 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h4><p>归约证明通常适用于基于公钥加密、数字签名、密钥交换等需要依赖数学难题的协议。对于结合多方交互或应用层逻辑较繁琐的协议（如跨链协议、链上链下融合协议等），可能需要在安全模型中增加更多场景假设后再进行归约分析。</p>
+<h1 id="链上协议的证明方法"><a href="#链上协议的证明方法" class="headerlink" title="链上协议的证明方法"></a>链上协议的证明方法</h1><p>与传统的中心化系统相比，区块链网络在去中心化、透明度和不可篡改等方面具有显著的优势。然而，这些特性也带来了新的攻击面和安全风险：</p>
+<p><strong>去中心化与共识机制：</strong>块链通过分布式节点达成共识来维护账本的一致性，不依赖任何单一的中央机构。虽然这能有效减少单点故障的风险，但同时意味着攻击者只要能控制或影响到一定比例的节点，就有可能破坏共识流程（如51%算力攻击或拜占庭故障攻击）[29]。</p>
+<p>此外，由于节点地理分布广泛，网络延迟、网络分区等问题也可能被恶意利用，导致分叉、交易回滚或双花攻击等安全隐患。</p>
+<p><strong>公开透明的合约代码：</strong>在公有链环境下（如以太坊），智能合约的源码大多是公开的，任何人都可以审阅合约逻辑并从中寻找漏洞。一旦发现安全缺陷，攻击者可以快速定位并利用漏洞，进行针对性攻击，例如重入攻击、整数溢出或者权限错误配置。[21]</p>
+<p><strong>不可篡改与数据持久性：</strong>区块链上已确认的交易或合约状态难以篡改，除非进行极其耗费资源的回滚操作。这在一定程度上确保了历史数据的完整性，但如果智能合约逻辑本身存在缺陷，一旦部署则难以通过传统意义上的“热修复”快速修补，需要想办法通过合约升级或分叉来解决问题，增加了维护与运营难度。[20]</p>
+<h2 id="常见威胁类别"><a href="#常见威胁类别" class="headerlink" title="常见威胁类别"></a>常见威胁类别</h2><p>在链上协议或智能合约中，常见的威胁类别大致可分为以下几个方面。了解这些攻击场景有助于我们在设计和证明协议时做出有针对性的防御措施。</p>
+<h3 id="合约漏洞"><a href="#合约漏洞" class="headerlink" title="合约漏洞"></a>合约漏洞</h3><p><strong>重入攻击（Re-entrancy Attack**</strong>）**：攻击者在合约调用外部合约时利用状态更新时机不当，反复调用目标合约并窃取资金。</p>
+<p><strong>整数溢出/**</strong>下溢（Overflow/Underflow<strong>**）</strong>：攻击者利用数学运算的边界问题，导致余额或计数器在无意间重置，进而造成错误的业务逻辑或资产损失。</p>
+<p><strong>访问控制漏洞</strong>：智能合约中常使用 require 或权限修饰器控制函数的可调用主体，但若逻辑不严谨就可能被绕过，造成合约被随意调用或资产被非法转移。</p>
+<h3 id="重放攻击（Replay-Attack）"><a href="#重放攻击（Replay-Attack）" class="headerlink" title="重放攻击（Replay Attack）"></a>重放攻击（Replay Attack）</h3><p>在某些链上链下交互或跨链通信场景中，若没有做好消息的时间戳验证或唯一性检测，攻击者可以将同样的数据包或交易多次在不同上下文中重放，导致资源或资产被多次消耗。</p>
+<p><strong>女巫攻击（Sybil Attack**</strong>）：**在区块链环境中，攻击者可以创建大量假身份（节点）来操纵投票、共识或其他依赖节点数量的机制。女巫攻击尤其在P2P网络或去中心化投票中较为常见，需要额外的身份验证或抵押机制进行防范。[30]</p>
+<h3 id="共识层攻击"><a href="#共识层攻击" class="headerlink" title="共识层攻击"></a>共识层攻击</h3><p><strong>51%**</strong>攻击**：若攻击者掌握全网超过51%的算力或权益，则可自行决定哪些区块最终得到确认，从而进行双花攻击或拒绝某些交易上链。</p>
+<p><strong>自私挖矿（Selfish Mining**</strong>）**：攻击者在挖矿时秘密保留私有链，不及时将找到的新区块广播出去，企图累积更多区块后一次性发布，导致 honest 矿工浪费资源。[31]</p>
+<h3 id="Gas耗尽与拒绝服务"><a href="#Gas耗尽与拒绝服务" class="headerlink" title="Gas耗尽与拒绝服务"></a>Gas耗尽与拒绝服务</h3><p>以太坊等平台的“Gas”机制用来限制智能合约执行消耗。攻击者可能利用合约中的大量循环或复杂操作来消耗发起方的Gas，从而干扰合约的正常执行，或逼迫合约中止执行引发拒绝服务。[32]</p>
+<h2 id="价值与风险权衡"><a href="#价值与风险权衡" class="headerlink" title="价值与风险权衡"></a>价值与风险权衡</h2><p>链上协议能显著提升交易透明度与安全审计能力，但也引入了额外的风险与系统复杂度。对于从传统中心化系统迁移到区块链场景的业务，需要从以下角度进行价值与风险权衡：</p>
+<h3 id="透明度与隐私"><a href="#透明度与隐私" class="headerlink" title="透明度与隐私"></a>透明度与隐私</h3><p>区块链的所有交易都对外公开，带来“可审计性”的优点，同时也可能暴露用户账户余额或交易模式，导致隐私泄露。若业务高度依赖隐私保护，就需要结合零知识证明或隐私合约技术。</p>
+<h3 id="去中心化与可控性"><a href="#去中心化与可控性" class="headerlink" title="去中心化与可控性"></a>去中心化与可控性</h3><p>去中心化意味着不需要信任单一方，但在出现安全事故或重大漏洞时，也难以通过“一刀切”的方式回滚或修改数据。这个特性在监管和合规层面常会引发争议，需要在协议设计时考虑可升级性或紧急机制。</p>
+<h3 id="不可篡改与灵活度"><a href="#不可篡改与灵活度" class="headerlink" title="不可篡改与灵活度"></a>不可篡改与灵活度</h3><p>一旦部署在链上的协议发生错误，除非设计了升级代理合约（proxy pattern）或多签治理结构，否则修复和升级的代价相当高。因此在上线前需要投入更多资源进行审计与形式化验证，以降低潜在风险。</p>
+<h2 id="抵御威胁的关键思路"><a href="#抵御威胁的关键思路" class="headerlink" title="抵御威胁的关键思路"></a>抵御威胁的关键思路</h2><p>在了解了链上协议的特点与主要威胁后，本节将介绍常用的抵御策略，包括安全合约编程实践、经济激励和惩罚机制、可验证计算与零知识证明，以及多方安全计算（MPC）等先进技术。通过这些手段，协议设计者能够在不同层面上强化合约安全性并对潜在攻击实施有效防范。</p>
+<h3 id="全合约编程规范"><a href="#全合约编程规范" class="headerlink" title="全合约编程规范"></a>全合约编程规范</h3><h4 id="编译器与语言特性"><a href="#编译器与语言特性" class="headerlink" title="编译器与语言特性"></a>编译器与语言特性</h4><p>建议选择成熟度较高且具有安全特性支持的智能合约语言（如Solidity、Vyper等）。一些语言会在编译阶段或语法层面提供安全检查，例如限制整数溢出、禁止不安全的低级调用等。充分利用这些语言特性能减少常见漏洞的发生。[33]</p>
+<h4 id="设计模式与最佳实践"><a href="#设计模式与最佳实践" class="headerlink" title="设计模式与最佳实践"></a>设计模式与最佳实践</h4><p><strong>Checks-Effects-Interactions**</strong>模式**：先检查条件，然后更新合约内部状态，最后与外部合约进行交互，能有效防范重入攻击。[21]</p>
+<p><strong>使用安全库</strong>：官方或社区维护的安全库（如OpenZeppelin）提供了安全数学运算、权限控制、可升级代理合约等模块，能降低低级错误带来的风险。</p>
+<p><strong>最小权限原则（Principle of Least Privilege**</strong>）**：在合约内部和外部交互中，只暴露必要的接口与权限，防止过度授予权限导致的安全威胁。</p>
+<h4 id="形式化验证与审计"><a href="#形式化验证与审计" class="headerlink" title="形式化验证与审计"></a>形式化验证与审计</h4><p>在完成合约编写后，通常需要利用诸如Slither、MythX等静态分析工具，或结合模型检测、符号执行等技术对合约逻辑进行审计；对关键模块，还可以使用ProVerif、Tamarin等进行形式化验证。[25]</p>
+<p>一些企业或社区会聘请专业的第三方审计机构（如Trail of Bits、Consensys Diligence等）进行审计，帮助尽可能提前发现逻辑漏洞。</p>
+<h3 id="激励与惩罚机制"><a href="#激励与惩罚机制" class="headerlink" title="激励与惩罚机制"></a>激励与惩罚机制</h3><h4 id="Token激励"><a href="#Token激励" class="headerlink" title="Token激励"></a>Token激励</h4><p>链上协议往往涉及Token或加密货币。通过设计合理的经济模型，可以让节点或用户遵循协议获得收益，若作恶则面临代价。比如在权益证明（PoS）中，节点需要抵押代币来参与共识，一旦违规就会被惩罚没收部分或全部抵押金。</p>
+<h4 id="治理与投票"><a href="#治理与投票" class="headerlink" title="治理与投票"></a>治理与投票</h4><p>对于复杂的去中心化协议，常采用链上治理机制，让代币持有者投票决定合约升级或重大参数调整。若某些节点或参与方进行恶意操作或提交不利提案，在投票环节就可能被否决并受到信誉影响或经济损失。</p>
+<h4 id="惩罚与声誉机制"><a href="#惩罚与声誉机制" class="headerlink" title="惩罚与声誉机制"></a>惩罚与声誉机制</h4><p><strong>惩罚：</strong>在合约层面或共识层面设置处罚规则，如挖矿或出块时发现某节点双签（Double Signing）或离线过久，就会扣减其押金或权益。</p>
+<p><strong>声誉体系：</strong>在部分区块链应用中，引入对节点或用户行为的持续评估。连续贡献有益行为者会提高声誉值，恶意行为则降低声誉值，甚至被剔除出网络。</p>
+<h3 id="可验证计算与零知识证明"><a href="#可验证计算与零知识证明" class="headerlink" title="可验证计算与零知识证明"></a>可验证计算与零知识证明</h3><h4 id="可验证计算（Verifiable-Computation）"><a href="#可验证计算（Verifiable-Computation）" class="headerlink" title="可验证计算（Verifiable Computation）"></a>可验证计算（Verifiable Computation）</h4><p>为了确保链上执行结果的正确性和完整性，一些协议会将大量计算放到链下进行，并在链上只验证计算结果的正确性。[34]这样既能节省Gas和时间成本，又能避免链上重复计算造成的资源浪费。常见技术包括：</p>
+<p><strong>SNARKs**</strong>（Succinct Non-Interactive ARguments of Knowledge<strong>**）</strong>：如zk-SNARKs能在不暴露计算输入/细节的情况下，为计算结果生成一个简洁的证明，链上只需较短时间就能验证证明的有效性。</p>
+<p><strong>STARKs**</strong>（Scalable Transparent ARguments of Knowledge<strong>**）</strong>：与SNARKs相比不依赖可信设置，更注重透明性，但在某些实现上证明大小和验证速度会有区别。</p>
+<h4 id="零知识证明与隐私保护"><a href="#零知识证明与隐私保护" class="headerlink" title="零知识证明与隐私保护"></a>零知识证明与隐私保护</h4><p>区块链通常是透明的，但某些场景下需要保护交易隐私，例如金融数据或个人敏感信息。零知识证明允许证明者在不泄露信息本身的情况下，让验证者确信某个陈述为真。</p>
+<h4 id="应用实例："><a href="#应用实例：" class="headerlink" title="应用实例："></a>应用实例：</h4><p>Zcash中使用zk-SNARKs来隐藏交易金额与地址；</p>
+<p>以太坊Layer 2扩容方案中采用zk-Rollup，将大量交易打包证明后提交主链，从而既提高扩展性又保护隐私。</p>
+<h3 id="多方安全计算（MPC）"><a href="#多方安全计算（MPC）" class="headerlink" title="多方安全计算（MPC）"></a>多方安全计算（MPC）</h3><p>在链上链下融合的场景中，往往有多方需要共同计算某些敏感数据（如用户隐私、商业机密），但又不希望把数据完全暴露给其他方。多方安全计算（MPC）通过密码学手段实现“在不泄漏敏感信息的前提下完成计算并得到正确结果”的目标。</p>
+<h4 id="典型协议"><a href="#典型协议" class="headerlink" title="典型协议"></a>典型协议</h4><p><strong>阈值签名（Threshold Signature**</strong>）**：将私钥分成多份，分布在不同节点上，只有在大多数节点同意的情况下才能合成有效签名，用于提高数字资产保管的安全性。</p>
+<p><strong>秘密共享（Secret Sharing**</strong>）**：Shamir秘密共享等机制能保证即使少数节点遭到入侵，攻击者也无法恢复完整的敏感信息。</p>
+<p><strong>组合MPC**</strong>协议**：在学术界已经出现多种基于电路或基于同态加密的通用MPC协议，在实际区块链应用中可与共识层或合约层结合，进一步提升隐私与安全。[35]</p>
+<h4 id="在区块链中的应用"><a href="#在区块链中的应用" class="headerlink" title="在区块链中的应用"></a>在区块链中的应用</h4><p>当多方想要联合训练模型或交换数据，但又互不信任时，MPC能在链下完成主要计算，然后只将最终结果或加密证明上链公示，避免泄漏各方的原始数据。对于链上链下融合协议的安全证明而言，结合MPC的安全模型需要考虑更多角色、更多交互轮次的形式化分析。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>综观整门课程，从可证明安全理论的缘起与内涵，到常见的安全协议规约与证明方法，再到区块链环境下链上协议的特殊威胁与针对性防护，再结合“数据所有权转让协议”的具体案例分析，可以清晰地看到可证明安全理论在实际应用中的巨大价值和必要性。首先，可证明安全要求在基于复杂性假设或形式化模型的前提下，利用模拟范式或归约方法等思路，为协议的安全属性提供可量化、可检验的数学保证；这种严谨的设计与分析方式，与区块链去中心化、高透明度以及不可篡改等特性交相呼应，能够在合约部署或协议上线前尽早发现并修补潜在漏洞，从而最大程度地避免因恶意攻击或逻辑缺陷造成的财产损失与信誉损坏。其次，对于链上协议这种将核心逻辑直接写入智能合约、且常常公开暴露在透明的区块链网络中的应用场景，安全威胁更为多样且复杂，如合约漏洞、女巫攻击、重放攻击、共识层算力操纵等都可能在无形中危及系统的整体安全；因此，结合经济激励和惩罚机制、多方安全计算、零知识证明与可验证计算等技术手段，通过完备的安全模型进行系统化防御，才能既保障合约的正确性与高效性，又兼顾用户隐私与网络稳定性。而在“数据所有权转让协议”这一具体实例中，我们进一步看到如何把可证明安全的种种方法落地到实际业务流程，特别是通过形式化建模和自动化验证，让参与方在链上链下的交互过程中既能保护自身利益，也能确保数据的所有权边界和使用合规性得到可靠验证。这些理论与实践的结合，不仅为区块链领域的协议设计和实施提供了稳固的安全保障，也为后续更多跨领域的融合应用带来启示：在日益复杂的数字经济时代，只有将安全需求放在首位，依托严格的可证明安全技术与完善的协议设计，才能构筑起可信、可审计、可持续进化的业务生态。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>[1]  O. Goldreich. Foundations of Cryptography. Cambridge University Press, 2001.</p>
+<p>[2]  J. Katz, Y. Lindell. Introduction to Modern Cryptography. 2014.</p>
+<p>[3]  A. A Menezes. Handbook of applied cryptography. 1996.</p>
+<p>[4]  W. Diffie, M. Hellman. New directions in cryptography. IEEE Transactions on Information Theory, 22(6): 644-654, 1976.</p>
+<p>[5]  T. Elgamal. A public key cryptosystem and a signature scheme based on discrete logarithms. IEEE Transactions on Information Theory, 31(4): 469-472, 1985.</p>
+<p>[6]  S. Goldwasser, S. Micali. Probabilistic encryption. Journal of Computer and System Sciences, 28(2): 270-299, 1984.</p>
+<p>[7]  D. Boneh, V. Shoup. A graduate course in applied cryptography. Draft 0.5, 2020.</p>
+<p>[8]  U. Maurer. Modelling a public-key infrastructure. Lecture Notes in Computer Science, 325-350, 1996.</p>
+<p>[9]  A. R. Regenscheid. NIST Cryptographic Standards and Guidelines Development Process. National Institute of Standards and Technology, 2016.</p>
+<p>[10] Fuchun Guo’s Homepage. <a target="_blank" rel="noopener" href="https://documents.uow.edu.au/~fuchun/">https://documents.uow.edu.au/~fuchun/</a>.</p>
+<p>[11] 郭福春个人主页. <a target="_blank" rel="noopener" href="https://space.bilibili.com/2095536965">https://space.bilibili.com/2095536965</a>.</p>
+<p>[12] V. Shoup. On formal models for secure key exchange. 1999.</p>
+<p>[13] M. Bellare, P. Rogaway. Random oracles are practical. Proceedings of the 1st ACM conference on Computer and communications security - CCS ’93: 62-73, 1993.</p>
+<p>[14] A. Fiat, A. Shamir. How To Prove Yourself: Practical Solutions to Identification and Signature Problems. Advances in Cryptology — CRYPTO’ 86, 263: Springer Berlin Heidelberg, 186-194, 2006.</p>
+<p>[15] R. Canetti, O. Goldreich, S. Halevi. On the Random-Oracle Methodology as Applied to Length-Restricted Signature Schemes. Lecture Notes in Computer Science, 40-57, 2004.</p>
+<p>[16] D. Pointcheval, J. Stern. Security Arguments for Digital Signatures and Blind Signatures. Journal of Cryptology, 13(3): 361-396, 2000.</p>
+<p>[17] J. Camenisch, M. Stadler. Efficient group signature schemes for large groups. Lecture Notes in Computer Science, 410-424, 1997.</p>
+<p>[18] S. Nakamoto. Bitcoin: A peer-to-peer electronic cash system. Satoshi Nakamoto, 2008.</p>
+<p>[19] J. Garay, A. Kiayias, N. Leonardos. The Bitcoin Backbone Protocol: Analysis and Applications. Lecture Notes in Computer Science, 281-310, 2015.</p>
+<p>[20] V. Buterin. A next-generation smart contract and decentralized application platform. white paper, 3(37): 2-1, 2014.</p>
+<p>[21] L. Luu, D. H. Chu, H. Olickel, P. Saxena, A. Hobor. Making Smart Contracts Smarter. Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security: 254-269, 2016.</p>
+<p>[22] N. Atzei, M. Bartoletti, T. Cimoli. A Survey of Attacks on Ethereum Smart Contracts (SoK). Lecture Notes in Computer Science, 164-186, 2017.</p>
+<p>[23] J. Groth. On the Size of Pairing-Based Non-interactive Arguments. Lecture Notes in Computer Science, 305-326, 2016.</p>
+<p>[24] A. Poelstra. Mimblewimble: Private, Massively-Prunable Blockchains.</p>
+<p>[25] P. Tsankov, A. Dan, D. Drachsler-Cohen, A. Gervais, F. Bünzli, M. Vechev. Securify: Practical Security Analysis of Smart Contracts. Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security: 2018.</p>
+<p>[26] G. Lowe. A hierarchy of authentication specifications. Proceedings 10th Computer Security Foundations Workshop: 31-43, 1997.</p>
+<p>[27] M. Abadi, C. Fournet. Mobile values, new names, and secure communication. ACM SIGPLAN Notices, 36(3): 104-115, 2001.</p>
+<p>[28] E. M. Clarke, J. M. Wing. Formal Methods: State of the Art and Future Directions. ACM Computing Surveys, 28(4): 626-643, 1996.</p>
+<p>[29] I. Eyal, E. G. Sirer. Majority Is Not Enough: Bitcoin Mining Is Vulnerable. Lecture Notes in Computer Science, 436-454, 2014.</p>
+<p>[30] J. R. Douceur. The Sybil Attack. Lecture Notes in Computer Science, 251-260, 2002.</p>
+<p>[31] I. Eyal. The Miner’s Dilemma. 2015 IEEE Symposium on Security and Privacy: 2015.</p>
+<p>[32] C. P. Gilman. The Yellow Wall-Paper. The Yellow Wall-Paper and Other Stories, 2009.</p>
+<p>[33] C. Dannen. Solidity Programming. Introducing Ethereum and Solidity, 69-88, 2017.</p>
+<p>[34] R. Gennaro, C. Gentry, B. Parno. Non-interactive Verifiable Computing: Outsourcing Computation to Untrusted Workers. Lecture Notes in Computer Science, 465-482, 2010.</p>
+<p>[35] I. Damgård, M. Keller, E. Larraia, V. Pastro, P. Scholl, N. P. Smart. Practical Covertly Secure MPC for Dishonest Majority – Or: Breaking the SPDZ Limits. Lecture Notes in Computer Science, 1-18, 2013.</p>
+<p>[36] M. Herlihy. Atomic Cross-Chain Swaps. arXiv:1801.09515, 2018.</p>
+<p>[37] A. Dalton, D. Thomas, P. Cheung. Secret Swapping: Two Party Fair Exchange. Cryptology ePrint Archive, 2023.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn">HPShark</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/">https://www.happyshark.cn/2025/01/23/链上链下融合协议的安全证明方式分析/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.happyshark.cn" target="_blank">Happy Shark</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6/">安全规约</a><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E/">安全证明</a><a class="post-meta__tags" href="/tags/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88/">链上链下融合</a></div><div class="post_share"><div class="social-share" data-image="https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2025/01/13/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/" title="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）"><img class="cover" src="https://blogimages.happyshark.cn/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/20250113232341.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/03/05/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%AC%AC%E4%BA%94%E8%AE%B2%E2%80%94%E2%80%94%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%9A%84%E5%9B%B0%E9%9A%BE%E6%80%A7/" title="安全规约第五讲——安全规约的困难性"><img class="cover" src="https://blogimages.happyshark.cn/安全规约第一讲/20211012125638.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-05</div><div class="title">安全规约第五讲——安全规约的困难性</div></div></a></div><div><a href="/2022/03/04/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%AC%AC%E5%9B%9B%E8%AE%B2%E2%80%94%E2%80%94%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E5%85%A5%E9%97%A8/" title="安全规约第四讲——安全规约入门"><img class="cover" src="https://blogimages.happyshark.cn/安全规约第一讲/20211012125638.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-04</div><div class="title">安全规约第四讲——安全规约入门</div></div></a></div><div><a href="/2022/03/03/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%AC%AC%E4%B8%89%E8%AE%B2%E2%80%94%E2%80%94%E5%9B%B0%E9%9A%BE%E9%97%AE%E9%A2%98%E5%92%8C%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%87%8A/" title="安全规约第三讲——困难问题和安全规约的基本解释"><img class="cover" src="https://blogimages.happyshark.cn/安全规约第一讲/20211012125638.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-03</div><div class="title">安全规约第三讲——困难问题和安全规约的基本解释</div></div></a></div><div><a href="/2022/03/02/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%AC%AC%E4%BA%8C%E8%AE%B2%E2%80%94%E2%80%94%E6%9C%89%E9%99%90%E5%9F%9F%EF%BC%8C%E7%BE%A4%EF%BC%8C%E5%8F%8C%E7%BA%BF%E6%80%A7%E5%AF%B9%EF%BC%8C%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/" title="安全规约第二讲——有限域，群，双线性对，哈希函数"><img class="cover" src="https://blogimages.happyshark.cn/安全规约第一讲/20211012125638.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-02</div><div class="title">安全规约第二讲——有限域，群，双线性对，哈希函数</div></div></a></div><div><a href="/2021/10/12/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6%E7%AC%AC%E4%B8%80%E8%AE%B2/" title="安全规约第一讲"><img class="cover" src="https://blogimages.happyshark.cn/安全规约第一讲/20211012125638.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-10-12</div><div class="title">安全规约第一讲</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">HPShark</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/HPShark"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:happyshark520@outlook.com" target="_blank" title="Email"><i class="fa fa-envelope"></i></a><a class="social-icon" href="/atom.xml" target="_blank" title="RSS"><i class="fa fa-rss"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">感谢访问，欢迎交换友链~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E7%90%86%E8%AE%BA%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">可证明安全理论概述</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E8%83%8C%E6%99%AF"><span class="toc-number">1.1.</span> <span class="toc-text">可证明安全的定义与背景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">可证明安全的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E7%9A%84%E5%8F%91%E5%B1%95%E8%83%8C%E6%99%AF"><span class="toc-number">1.1.2.</span> <span class="toc-text">可证明安全的发展背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E6%84%8F%E4%B9%89"><span class="toc-number">1.1.3.</span> <span class="toc-text">研究意义</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">常见的可证明安全方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%A4%8D%E6%9D%82%E6%80%A7%E5%81%87%E8%AE%BE%E7%9A%84%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">基于复杂性假设的可证明安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E9%9A%8F%E6%9C%BA%E9%A2%84%E8%A8%80%E6%9C%BA%E6%A8%A1%E5%9E%8B%EF%BC%88Random-Oracle-Model%EF%BC%8CROM%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">基于随机预言机模型（Random Oracle Model，ROM）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%A0%87%E5%87%86%E6%A8%A1%E5%9E%8B%EF%BC%88Standard-Model%EF%BC%89%E7%9A%84%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8"><span class="toc-number">1.2.3.</span> <span class="toc-text">基于标准模型（Standard Model）的可证明安全</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E5%9C%A8%E5%8C%BA%E5%9D%97%E9%93%BE%E9%A2%86%E5%9F%9F%E7%9A%84%E5%9C%B0%E4%BD%8D"><span class="toc-number">1.3.</span> <span class="toc-text">可证明安全在区块链领域的地位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%AF%B9%E5%AE%89%E5%85%A8%E7%9A%84%E7%89%B9%E6%AE%8A%E9%9C%80%E6%B1%82"><span class="toc-number">1.3.1.</span> <span class="toc-text">区块链对安全的特殊需求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%AF%81%E6%98%8E%E5%AE%89%E5%85%A8%E5%9C%A8%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E4%B8%8E%E9%93%BE%E4%B8%8A%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1%E4%B8%AD%E7%9A%84%E6%84%8F%E4%B9%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">可证明安全在智能合约与链上协议设计中的意义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E5%AE%9E%E8%B7%B5%E6%A1%88%E4%BE%8B"><span class="toc-number">1.3.3.</span> <span class="toc-text">典型实践案例</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%93%BE%E4%B8%8B%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AF%81%E6%98%8E%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">链下安全协议的证明方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%A7%84%E7%BA%A6%E6%96%B9%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">常见安全协议的规约方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E8%AF%AD%E4%B9%89%E4%B8%8E%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0"><span class="toc-number">2.1.1.</span> <span class="toc-text">协议语义与流程描述</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E8%AF%AD%E4%B9%89%E7%9A%84%E5%86%85%E6%B6%B5"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">协议语义的内涵</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0%E7%9A%84%E5%B8%B8%E8%A7%81%E6%96%B9%E5%BC%8F"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">流程描述的常见方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E8%AF%AD%E4%B9%89%E6%8F%8F%E8%BF%B0%E8%A6%81%E7%82%B9"><span class="toc-number">2.1.1.3.</span> <span class="toc-text">协议语义描述要点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E7%89%B9%E6%80%A7%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">2.1.2.</span> <span class="toc-text">安全特性的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%A2%E5%BC%8F%E5%8C%96%E6%96%B9%E6%B3%95%E4%B8%8E%E5%B7%A5%E5%85%B7"><span class="toc-number">2.1.3.</span> <span class="toc-text">形式化方法与工具</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E5%BD%A2%E5%BC%8F%E5%8C%96%E5%B7%A5%E5%85%B7"><span class="toc-number">2.1.3.1.</span> <span class="toc-text">典型形式化工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E7%9A%84%E5%B1%80%E9%99%90%E4%B8%8E%E5%BB%BA%E8%AE%AE"><span class="toc-number">2.1.3.2.</span> <span class="toc-text">工具使用的局限与建议</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">安全模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E4%BF%A1%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.1.</span> <span class="toc-text">通信模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E4%B8%8E%E5%BC%82%E6%AD%A5"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">同步与异步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%82%B9%E5%AF%B9%E7%82%B9%E4%B8%8E%E5%B9%BF%E6%92%AD"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">点对点与广播</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%EF%BC%88TTP%EF%BC%89%E7%9A%84%E5%AD%98%E5%9C%A8%E4%B8%8E%E5%90%A6"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">可信第三方（TTP）的存在与否</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E8%80%85%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.2.</span> <span class="toc-text">攻击者模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%81%87%E8%AE%BE%E4%B8%8E%E4%BF%A1%E4%BB%BB%E7%8E%AF%E5%A2%83"><span class="toc-number">2.2.3.</span> <span class="toc-text">系统假设与信任环境</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E"><span class="toc-number">2.3.</span> <span class="toc-text">安全证明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E8%8C%83%E5%BC%8F%EF%BC%88Simulation-Paradigm%EF%BC%89"><span class="toc-number">2.3.1.</span> <span class="toc-text">模拟范式（Simulation Paradigm）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E6%A6%82%E5%BF%B5"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">关键概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-number">2.3.1.2.</span> <span class="toc-text">优缺点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%92%E7%BA%A6%E8%AF%81%E6%98%8E%EF%BC%88Reduction%EF%BC%89"><span class="toc-number">2.3.2.</span> <span class="toc-text">归约证明（Reduction）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E5%A4%8D%E6%9D%82%E9%9A%BE%E9%A2%98"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">常见复杂难题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%92%E7%BA%A6%E8%AF%81%E6%98%8E%E7%9A%84%E6%9E%84%E9%80%A0%E6%8A%80%E5%B7%A7"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">归约证明的构造技巧</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">适用范围</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%93%BE%E4%B8%8A%E5%8D%8F%E8%AE%AE%E7%9A%84%E8%AF%81%E6%98%8E%E6%96%B9%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">链上协议的证明方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E5%A8%81%E8%83%81%E7%B1%BB%E5%88%AB"><span class="toc-number">3.1.</span> <span class="toc-text">常见威胁类别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.1.1.</span> <span class="toc-text">合约漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%EF%BC%88Replay-Attack%EF%BC%89"><span class="toc-number">3.1.2.</span> <span class="toc-text">重放攻击（Replay Attack）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B1%E8%AF%86%E5%B1%82%E6%94%BB%E5%87%BB"><span class="toc-number">3.1.3.</span> <span class="toc-text">共识层攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gas%E8%80%97%E5%B0%BD%E4%B8%8E%E6%8B%92%E7%BB%9D%E6%9C%8D%E5%8A%A1"><span class="toc-number">3.1.4.</span> <span class="toc-text">Gas耗尽与拒绝服务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%B7%E5%80%BC%E4%B8%8E%E9%A3%8E%E9%99%A9%E6%9D%83%E8%A1%A1"><span class="toc-number">3.2.</span> <span class="toc-text">价值与风险权衡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%8F%E6%98%8E%E5%BA%A6%E4%B8%8E%E9%9A%90%E7%A7%81"><span class="toc-number">3.2.1.</span> <span class="toc-text">透明度与隐私</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E4%B8%8E%E5%8F%AF%E6%8E%A7%E6%80%A7"><span class="toc-number">3.2.2.</span> <span class="toc-text">去中心化与可控性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8D%E5%8F%AF%E7%AF%A1%E6%94%B9%E4%B8%8E%E7%81%B5%E6%B4%BB%E5%BA%A6"><span class="toc-number">3.2.3.</span> <span class="toc-text">不可篡改与灵活度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%B5%E5%BE%A1%E5%A8%81%E8%83%81%E7%9A%84%E5%85%B3%E9%94%AE%E6%80%9D%E8%B7%AF"><span class="toc-number">3.3.</span> <span class="toc-text">抵御威胁的关键思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A8%E5%90%88%E7%BA%A6%E7%BC%96%E7%A8%8B%E8%A7%84%E8%8C%83"><span class="toc-number">3.3.1.</span> <span class="toc-text">全合约编程规范</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%99%A8%E4%B8%8E%E8%AF%AD%E8%A8%80%E7%89%B9%E6%80%A7"><span class="toc-number">3.3.1.1.</span> <span class="toc-text">编译器与语言特性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">3.3.1.2.</span> <span class="toc-text">设计模式与最佳实践</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%A2%E5%BC%8F%E5%8C%96%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%AE%A1%E8%AE%A1"><span class="toc-number">3.3.1.3.</span> <span class="toc-text">形式化验证与审计</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BF%80%E5%8A%B1%E4%B8%8E%E6%83%A9%E7%BD%9A%E6%9C%BA%E5%88%B6"><span class="toc-number">3.3.2.</span> <span class="toc-text">激励与惩罚机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Token%E6%BF%80%E5%8A%B1"><span class="toc-number">3.3.2.1.</span> <span class="toc-text">Token激励</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B2%BB%E7%90%86%E4%B8%8E%E6%8A%95%E7%A5%A8"><span class="toc-number">3.3.2.2.</span> <span class="toc-text">治理与投票</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%83%A9%E7%BD%9A%E4%B8%8E%E5%A3%B0%E8%AA%89%E6%9C%BA%E5%88%B6"><span class="toc-number">3.3.2.3.</span> <span class="toc-text">惩罚与声誉机制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E9%AA%8C%E8%AF%81%E8%AE%A1%E7%AE%97%E4%B8%8E%E9%9B%B6%E7%9F%A5%E8%AF%86%E8%AF%81%E6%98%8E"><span class="toc-number">3.3.3.</span> <span class="toc-text">可验证计算与零知识证明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E9%AA%8C%E8%AF%81%E8%AE%A1%E7%AE%97%EF%BC%88Verifiable-Computation%EF%BC%89"><span class="toc-number">3.3.3.1.</span> <span class="toc-text">可验证计算（Verifiable Computation）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9B%B6%E7%9F%A5%E8%AF%86%E8%AF%81%E6%98%8E%E4%B8%8E%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4"><span class="toc-number">3.3.3.2.</span> <span class="toc-text">零知识证明与隐私保护</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9A"><span class="toc-number">3.3.3.3.</span> <span class="toc-text">应用实例：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%96%B9%E5%AE%89%E5%85%A8%E8%AE%A1%E7%AE%97%EF%BC%88MPC%EF%BC%89"><span class="toc-number">3.3.4.</span> <span class="toc-text">多方安全计算（MPC）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E5%8D%8F%E8%AE%AE"><span class="toc-number">3.3.4.1.</span> <span class="toc-text">典型协议</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">3.3.4.2.</span> <span class="toc-text">在区块链中的应用</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-number">5.</span> <span class="toc-text">参考文献</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/" title="链上链下融合协议的安全证明方式分析"><img src="https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="链上链下融合协议的安全证明方式分析"/></a><div class="content"><a class="title" href="/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/" title="链上链下融合协议的安全证明方式分析">链上链下融合协议的安全证明方式分析</a><time datetime="2025-01-22T16:00:00.000Z" title="发表于 2025-01-23 00:00:00">2025-01-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/01/13/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/" title="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）"><img src="https://blogimages.happyshark.cn/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/20250113232341.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）"/></a><div class="content"><a class="title" href="/2025/01/13/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/" title="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）">中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）</a><time datetime="2025-01-12T16:00:00.000Z" title="发表于 2025-01-13 00:00:00">2025-01-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/12/09/dblp%20rss%E8%BD%AC%E6%8D%A2%E5%99%A8%E9%83%A8%E7%BD%B2/" title="dblp rss转换器部署"><img src="https://blogimages.happyshark.cn/dblp%20rss%E8%BD%AC%E6%8D%A2%E5%99%A8%E9%83%A8%E7%BD%B2/20250121122415.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="dblp rss转换器部署"/></a><div class="content"><a class="title" href="/2024/12/09/dblp%20rss%E8%BD%AC%E6%8D%A2%E5%99%A8%E9%83%A8%E7%BD%B2/" title="dblp rss转换器部署">dblp rss转换器部署</a><time datetime="2024-12-08T16:00:00.000Z" title="发表于 2024-12-09 00:00:00">2024-12-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/05/28/windows%E9%83%A8%E7%BD%B2ubuntu%20wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows%20GPU/" title="windows部署ubuntu wsl2子系统并调用windows GPU"><img src="https://blogimages.happyshark.cn/windows部署ubuntu-wsl2子系统并调用windows-GPU/20240528162201.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="windows部署ubuntu wsl2子系统并调用windows GPU"/></a><div class="content"><a class="title" href="/2024/05/28/windows%E9%83%A8%E7%BD%B2ubuntu%20wsl2%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%B0%83%E7%94%A8windows%20GPU/" title="windows部署ubuntu wsl2子系统并调用windows GPU">windows部署ubuntu wsl2子系统并调用windows GPU</a><time datetime="2024-05-27T16:00:00.000Z" title="发表于 2024-05-28 00:00:00">2024-05-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/10/24/%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%AD%A6%E4%B9%A0/" title="语法大学习"><img src="https://blogimages.happyshark.cn/%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%AD%A6%E4%B9%A0/20231024155934.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="语法大学习"/></a><div class="content"><a class="title" href="/2023/10/24/%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%AD%A6%E4%B9%A0/" title="语法大学习">语法大学习</a><time datetime="2023-10-24T14:00:00.000Z" title="发表于 2023-10-24 22:00:00">2023-10-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2016 - 2025 By HPShark</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">有问题为什么不问问神奇的海螺呢？</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js" type="module"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.5.0/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const loadUtterances = () => {
+    let ele = document.createElement('script')
+    ele.id = 'utterances_comment'
+    ele.src = 'https://utteranc.es/client.js'
+    ele.setAttribute('repo', 'HPShark/blogcomment')
+    ele.setAttribute('issue-term', 'title')
+    const nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+    ele.setAttribute('theme', nowTheme)
+    ele.crossOrigin = 'anonymous'
+    ele.async = true
+    document.getElementById('utterances-wrap').appendChild(ele)
+  }
+
+  const utterancesTheme = theme => {
+    const iframe = document.querySelector('.utterances-frame')
+    if (iframe) {
+      const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+      const message = {
+        type: 'set-theme',
+        theme: theme
+      };
+      iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+    }
+  }
+
+  btf.addGlobalFn('themeChange', utterancesTheme, 'utterances')
+
+  if ('Utterances' === 'Utterances' || !false) {
+    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+    else loadUtterances()
+  } else {
+    window.loadOtherComment = loadUtterances
+  }
+})()</script></div><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const findTrueUrl = (array) => {
+    Promise.all(array.map(item =>
+      fetch(item.url).then(resp => resp.json()).then(data => {
+        const urlArray = data.body.match(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/ig)
+        if (data.user.login === 'utterances-bot') {
+          return urlArray.pop()
+        } else {
+          return urlArray.shift()
+        }
+      })
+    )).then(res => {
+        array = array.map((i,index)=> {
+          return {
+            ...i,
+            url: res[index]
+          }
+        })
+
+        saveToLocal.set('github-newest-comments', JSON.stringify(array), 10/(60*24))
+        generateHtml(array)
+    });
+  }
+
+  const getComment = () => {
+    fetch('https://api.github.com/repos/HPShark/blogcomment/issues/comments?sort=updated&direction=desc&per_page=6&page=1',{
+      "headers": {
+        Accept: 'application/vnd.github.v3.html+json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const githubArray = data.map(item => {
+          return {
+            'avatar': item.user.avatar_url,
+            'content': changeContent(item.body_html),
+            'nick': item.user.login,
+            'url': item.issue_url,
+            'date': item.updated_at,
+            'githubUrl': item.html_url
+          }
+        })
+        findTrueUrl(githubArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.textContent= "无法获取评论，请确认相关配置是否正确"
+      })
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('github-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><div class="aplayer no-destroy" data-id="321805866" data-server="netease" data-order="random" data-type="playlist" data-mini="true" data-fixed="true" data-autoplay="true"> </div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-nest.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/click-show-text.min.js" data-mobile="true" data-text="计算机,豆浆机,榨汁机,传真机,汽轮机,内燃机,灭火机,掘土机,扩音机,截击机,教练机,舰载机,录音机,録音机,录像机,录影机,留声机,离心机,老虎机,冷冻机,歼击机,交换机,鼓风机,轰炸机,滑翔机,发电机,放映机,法郎机,发动机,反潜机,发报机,缝纫机,复印机,锅驼机,滚齿机,油印机,永动机,轧道机,轧钢机,凿岩机,运输机,榨油机,轧染机,战斗机,直升机,织布机,制冷机,照相机,侦察机,装载机,缫丝机,坐飞机,钻探机,钻井机,涡轮机,洗衣机,压路机,压缩机,旋翼机,压力机,心肺机,扬谷机,预警机,曳引机,速印机,通风机,透平机,送风机,拖拉机,推土机,脱粒机,小军机,寻呼机,打桩机,打印机,打字机,打火机,电话机,铲土机,柴油机,吹风机,耳塞机,电唱机,电报机,杜德机,电视机,电动机,对撞机,对讲机,放像机,动力机,订书机,铲运机,步谈机,报话机,步话机,播种机,伞翼机,扇风机,扫除机,爆炸机,收报机,摄像机,收录机,收音机,升降机,视盘机,升船机,说兵机,水轮机,顺风机,水上飞机,收发信机,数码相机,数字相机,生态危机,审势相机,暗藏杀机,傻里巴机,傻里八机,白费心机,剥复之机,财政危机,不失时机,持重待机,犯罪动机,喘息之机,东条英机,倒纻翻机,错过时机,枉费心机,枉用心机,微特电机,天赐良机,通险畅机,随物应机,贻误军机,一日万机,一线生机,斜翼飞机,泄露天机,鸭式飞机,泄漏天机,袖里玄机,坐失事机,坐失良机,走漏天机,运策决机,用尽心机,语不投机,光计算机,购买动机,观变沉机,工作母机,费尽心机,反潜飞机,话不投机,航天飞机,火箭飞机,活泼天机,漏泄天机,可乘之机,静不露机,经济危机,决胜之机,将机就机,空天飞机,军用飞机,鸥鸟忘机,妙算神机,鸥鹭忘机,日理万机,燃气轮机,施关发机,日有万机,煞费心机,全天候飞机,汽轮发电机,喷气式飞机,喷气发动机,联合收割机,卡式录音机,绝热发动机,空气压缩机,空中加油机,火箭发动机,轮式拖拉机,活塞式飞机,航空发动机,海军轰炸机,反潜直升机,分时计算机,异步发电机,异步电动机,直流发电机,直流电动机,中央处理机,中华学习机,专用计算机,自动取款机,自动柜员机,武装直升机,亚声速飞机,外围处理机,同步电动机,通用计算机,同步发电机,网络计算机,微型计算机,电影放映机,电影摄影机,电视摄影机,单板计算机,调频收音机,电子计算机,电视接收机,电子游戏机,超声速飞机,实时计算机,手扶拖拉机,水轮发电机,数据流计算机,变后掠翼飞机,电子对抗飞机,无人驾驶飞机,混凝土搅拌机,工业用拖拉机,混凝土振捣机,履带式拖拉机,控制流计算机,空气喷气发动机,卡拉ok伴唱机,涡轮螺旋桨飞机,单片微型计算机,电子数字计算机,电子模拟计算机,第三代电子计算机,第四代电子计算机,第五代电子计算机,第一代电子计算机,第二代电子计算机,活塞式航空发动机,混合式电子计算机,难得者时，易失者机,垂直和短距起落飞机,善观风色，善择时机,双水内冷汽轮发电机" data-fontsize="15px" data-random="false" async="async"></script><div class="fb-customerchat" id="fb-customer-chat" page_id="106213005918479" attribution="biz_inbox"></div><script>(() => {
+  document.getElementById('fb-root') ? '' : document.body.insertAdjacentHTML('afterend', '<div id="fb-root"></div>')
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml: true,
+      version: 'v16.0'
+    });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/zh_CN/sdk/xfbml.customerchat.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  const isChatBtn = true
+  const isChatHideShow = true
+
+  if (isChatBtn) {
+    window.chatBtnFn = () => {
+      const isShow = document.querySelector('.fb_customer_chat_bounce_in_v2')
+      isShow ? FB.CustomerChat.hide() : FB.CustomerChat.show()
+    }
+  } else if (isChatHideShow) {
+    window.chatBtn = {
+      hide: () => {
+        FB.CustomerChat.hide()
+      },
+      show: () => {
+        FB.CustomerChat.show(false)
+      }
+    }
+  }
+})()</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/metingjs/dist/Meting.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/Gallery/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'UA-116830180-1', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":120,"height":240,"hOffset":30},"mobile":{"show":true}});</script></body></html>
