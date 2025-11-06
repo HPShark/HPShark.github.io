@@ -6,7 +6,7 @@
   <link href="https://www.happyshark.cn/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2025-04-21T16:00:00.000Z</updated>
+  <updated>2025-11-05T16:00:00.000Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</title>
+    <link href="https://www.happyshark.cn/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
+    <id>https://www.happyshark.cn/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</id>
+    <published>2025-11-05T16:00:00.000Z</published>
+    <updated>2025-11-05T16:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>物理机上跑了个ESXI6.7，运行了一个win10的虚拟机，但是虚拟机里头需要用hyper-v跑一个linux子系统，结果按网上的教程改桥接之后子系统死活上不了网，罪魁祸首就是ESXI默认不开启混杂模式，只要跟虚拟机的mac不一样的帧通通丢弃</p><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p><strong>VMware 的虚拟网卡</strong>（<code>Ethernet0</code> 的 MAC 以 <code>00:0C:29</code> 开头，这是 VMware 的 OUI），型号也正是 VMware 常用的 <em>Intel 82574L (e1000e)</em>。这说明你是在 <strong>VMware 里再跑 Hyper-V</strong>（嵌套虚拟化）。在这种架构下，把 Hyper-V 的“外网 vSwitch”绑到这块 VMware 虚拟网卡时，上层的 VMware vSwitch 默认会<strong>丢弃来自子虚拟机的 MAC</strong>（DHCP/ARP 都过不去），所以 Ubuntu 一接上“外网”就“断网/拿不到 IP”</p><p>嵌套场景里，内层 VM（Ubuntu）的帧会带 <strong>Ubuntu 自己的 MAC</strong> 从 Windows 这块“e1000e”虚拟网卡发出去；若上层 vSwitch 不允许“伪造/变化 MAC”或混杂接收，就会被过滤，导致 DHCP/ARP 都失败。</p><h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p><strong>ESXi</strong>：把这台 Windows VM 所在<strong>端口组</strong>的安全策略改成<strong>Promiscuous Mode = Accept</strong>、<strong>MAC Address Changes = Accept</strong>、<strong>Forged Transmits = Accept</strong>。这些就是允许上层 vSwitch 接收/转发“不同源 MAC”的帧，是跑嵌套 Hyper-V/ESXi 的标准做法。</p><p><img src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20251106163730795.png" alt="image-20251106163730795"></p><p>当然对于Workstation / Fusion：开启所连 VMnet 的<strong>混杂模式（Promiscuous/Allow VMs）</strong>，必要时（在 Linux 主机上）给 <code>/dev/vmnet*</code> 赋读写权限；有时还需在对应 VMX 里把 <code>ethernet0.noPromisc = &quot;FALSE&quot;</code></p><h2 id="检查"><a href="#检查" class="headerlink" title="检查"></a>检查</h2><p>完美！</p><p><img src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20251106163905931.png" alt="image-20251106163905931"></p>]]></content>
+    
+    
+    <summary type="html">嵌套虚拟化要在esxi里的交换机设置里头开启混杂模式，以便不同mac帧都能被esxi的网卡识别并转发！</summary>
+    
+    
+    
+    <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="技术" scheme="https://www.happyshark.cn/tags/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
   
   <entry>
     <title>不安全的实例</title>
@@ -129,9 +152,9 @@
     <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
     
     
-    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
-    
     <category term="技术" scheme="https://www.happyshark.cn/tags/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   
@@ -294,9 +317,9 @@
     <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
     
     
-    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
-    
     <category term="技术" scheme="https://www.happyshark.cn/tags/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   
@@ -317,9 +340,9 @@
     <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
     
     
-    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
-    
     <category term="技术" scheme="https://www.happyshark.cn/tags/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   
@@ -439,27 +462,6 @@
     
     
     <summary type="html">老妈的传统手艺，蒸面条！感觉还是手工面好吃一些，不过这次没买到就只能吃机器压的面了</summary>
-    
-    
-    
-    <category term="厨房里的秘密" scheme="https://www.happyshark.cn/categories/%E5%8E%A8%E6%88%BF%E9%87%8C%E7%9A%84%E7%A7%98%E5%AF%86/"/>
-    
-    
-    <category term="家的味道" scheme="https://www.happyshark.cn/tags/%E5%AE%B6%E7%9A%84%E5%91%B3%E9%81%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>炒扇贝肉</title>
-    <link href="https://www.happyshark.cn/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/"/>
-    <id>https://www.happyshark.cn/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/</id>
-    <published>2022-02-10T04:00:00.000Z</published>
-    <updated>2022-02-10T04:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<hr><ol><li><p>把贝壳肉清理出来，去掉内胆杂质</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151231250.png" alt="image-20220210151231250"></p></li><li><p>锅里加油，放姜和辣椒抄一抄出锅备用</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151256350.png" alt="image-20220210151256350"></p></li><li><p>加油放葱姜香锅，放扇贝肉炒熟，改中火加酱油调色，耗油调味，料酒去腥</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151314665.png" alt="image-20220210151314665"></p></li><li><p>把辣椒加进去拌开，尝尝咸淡，淡的话可以加点盐。小火收汁出锅</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151339498.png" alt="image-20220210151339498"></p></li></ol>]]></content>
-    
-    
-    <summary type="html">一大袋子扇贝，弄完就一点点，不够塞牙缝的</summary>
     
     
     
