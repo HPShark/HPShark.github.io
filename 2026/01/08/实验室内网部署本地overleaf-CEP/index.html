@@ -1,0 +1,683 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>实验室内网部署本地overleaf-CEP | Happy Shark</title><meta name="author" content="HPShark"><meta name="copyright" content="HPShark"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="实验室最近有论文协作撰写需求，开台虚拟机配置一个内网版的overleaf，就不用在官网花80刀开会员了~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实验室内网部署本地overleaf-CEP">
+<meta property="og:url" content="https://www.happyshark.cn/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/index.html">
+<meta property="og:site_name" content="Happy Shark">
+<meta property="og:description" content="实验室最近有论文协作撰写需求，开台虚拟机配置一个内网版的overleaf，就不用在官网花80刀开会员了~">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260108170557.png">
+<meta property="article:published_time" content="2026-01-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-01T16:00:00.000Z">
+<meta property="article:author" content="HPShark">
+<meta property="article:tag" content="技术">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260108170557.png"><link rel="shortcut icon" href="https://blogimages.happyshark.cn/hexo/favicon.ico"><link rel="canonical" href="https://www.happyshark.cn/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/index.html"><link rel="preconnect" href="//cdnjs.cloudflare.com"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="9vVi06K024u7LLF-6lX2_RXCGcQqtDxtcmacxWGeZhM"/><meta name="baidu-site-verification" content="SoQqqYx4asw1Hjo3"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5fb1b716f40cab42e95bf5d2d279dd42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-116830180-1"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-116830180-1');
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"这篇文章发布于","messageNext":"天之前，文章中的部分内容可能会过期。"},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdnjs.cloudflare.com/ajax/libs/egjs-infinitegrid/4.10.1/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '实验室内网部署本地overleaf-CEP',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-02 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Happy Shark" type="application/atom+xml">
+</head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="https://www.unpkg.com/pace-js@latest/pace-theme-default.min.css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260108170557.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Happy Shark"><span class="site-name">Happy Shark</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">实验室内网部署本地overleaf-CEP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-01-07T16:00:00.000Z" title="发表于 2026-01-08 00:00:00">2026-01-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-01T16:00:00.000Z" title="更新于 2024-12-02 00:00:00">2024-12-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="实验室内网部署本地overleaf-CEP"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><hr>
+<p>实验室最近有论文协作撰写需求，开台虚拟机配置一个内网版的overleaf，就不用在官网花80刀开会员了~部署基于<a href="https://link.zhihu.com/?target=https%3A//github.com/yu-i-i/overleaf-cep">yu-i-i</a>开发并提供了Overleaf的社区增强版，提供了不少Server Pro才有的功能。<a target="_blank" rel="noopener" href="https://github.com/yu-i-i/overleaf-cep">https://github.com/yu-i-i/overleaf-cep</a></p>
+<h1 id="overleaf-配置"><a href="#overleaf-配置" class="headerlink" title="overleaf 配置"></a>overleaf 配置</h1><h2 id="开台干净的ubuntu机子并安装好docker"><a href="#开台干净的ubuntu机子并安装好docker" class="headerlink" title="开台干净的ubuntu机子并安装好docker"></a>开台干净的ubuntu机子并安装好docker</h2><ol>
+<li><p>获取sudo权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo su</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>确认docker版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-compose --version</span><br><span class="line">docker --version</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="获取安装工具"><a href="#获取安装工具" class="headerlink" title="获取安装工具"></a>获取安装工具</h2><p>增强版Overleaf的部署仍推荐使用官方的Overleaf工具包（<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=263821843&amp;content_type=Article&amp;match_order=1&amp;q=Overleaf-toolkit&amp;zhida_source=entity">Overleaf-toolkit</a>），因为这样可以利用已有的许多Overleaf-toolkit教程对Overleaf的服务进行配置。</p>
+<p>增强版的不同之处在于，它通过编辑docker-compose的yml文件，使得toolkit启动容器时使用修改过的sharelatex:ext-ce镜像而不是官方提供的sharelatex镜像，进而实现增强版功能。</p>
+<p>官方的Overleaf-toolkit可参考<a href="https://link.zhihu.com/?target=https%3A//github.com/overleaf/toolkit/">官方文档</a>进行拉取（在linux命令行中输入）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/overleaf/toolkit.git ./overleaf-toolkit</span><br></pre></td></tr></table></figure>
+<h2 id="设置配置文件"><a href="#设置配置文件" class="headerlink" title="设置配置文件"></a>设置配置文件</h2><p>进入路径~/overleaf-toolkit/中，初始化并查看config文件，并在~/overleaf-toolkit/config/中，添加一个名为 docker-compose.override.yml 的新配置文件。具体为以下步骤：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd overleaf-toolkit</span><br><span class="line">bin/init</span><br><span class="line">ls config</span><br><span class="line">cd config</span><br><span class="line">vi docker-compose.override.yml</span><br></pre></td></tr></table></figure>
+<p>在yml文件夹里写入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">services:</span><br><span class="line">    sharelatex:</span><br><span class="line">        image: sharelatex/sharelatex:ext-ce</span><br></pre></td></tr></table></figure>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260108171621186.png" alt="image-20260108171621186"></p>
+<h2 id="拉取-创建增强版镜像"><a href="#拉取-创建增强版镜像" class="headerlink" title="拉取/创建增强版镜像"></a>拉取/创建增强版镜像</h2><p>从<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=263821843&amp;content_type=Article&amp;match_order=1&amp;q=docker+hub&amp;zhida_source=entity">docker hub</a>里直接拉取镜像，在终端输入以下代码（目前最新版是6.0.1-ext-v3.3）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull overleafcep/sharelatex:6.0.1-ext-v3.3</span><br></pre></td></tr></table></figure>
+<p>如果想要其他版本，拉取相应的版本即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull overleafcep/sharelatex:5.5.4-ext-v3.1</span><br></pre></td></tr></table></figure>
+<p>有docker desktop的，可以直接在hub里面选择拉取：</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260108171756480.png" alt="image-20260108171756480"></p>
+<blockquote>
+<p>docker pull如果报错，说明也要配置代理，执行命令查看 <code>docker.service</code> 信息，得知配置文件位置 <code>/lib/systemd/system/docker.service</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">~$ systemctl status docker.service </span><br><span class="line">● docker.service - Docker Application Container Engine</span><br><span class="line">     Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)</span><br><span class="line">     Active: active (running) since Tue 2023-06-13 00:52:54 CST; 22h ago</span><br><span class="line">TriggeredBy: ● docker.socket</span><br><span class="line">       Docs: https://docs.docker.com</span><br><span class="line">   Main PID: 387690 (dockerd)</span><br><span class="line">      Tasks: 139</span><br><span class="line">     Memory: 89.6M</span><br><span class="line">        CPU: 1min 26.512s</span><br><span class="line">     CGroup: /system.slice/docker.service</span><br></pre></td></tr></table></figure>
+<p>在 <code>docker.service</code> 的 <code>[Service]</code> 模块添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Environment=HTTP_PROXY=http://192.168.6.25:10808</span><br><span class="line">Environment=HTTPS_PROXY=http://192.168.6.25:10808</span><br><span class="line">Environment=NO_PROXY=localhost,127.0.0.1</span><br></pre></td></tr></table></figure>
+<p>重新加载配置文件并重启服务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart docker.service</span><br></pre></td></tr></table></figure>
+<h3 id="修改-dockerd-配置文件"><a href="#修改-dockerd-配置文件" class="headerlink" title="修改 dockerd 配置文件"></a>修改 dockerd 配置文件</h3><p>还可以修改 <code>dockerd</code> 配置文件，添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy=&quot;http://proxyAddress:port&quot;</span><br></pre></td></tr></table></figure>
+<p>然后重启 <code>docker daemon</code> 即可。</p>
+<blockquote>
+<p>国内的镜像仓库在绝大多数时候都可以满足条件，但是存在个别镜像同步不及时的情况，如果使用 latest 标签拉取到的镜像并非近期的镜像，因此有时候需要直接从官方镜像仓库拉取镜像。</p>
+</blockquote>
+</blockquote>
+<h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><h3 id="docker-compose-override-yml"><a href="#docker-compose-override-yml" class="headerlink" title="docker-compose.override.yml"></a>docker-compose.override.yml</h3><p>这个文件内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">services:</span><br><span class="line">    sharelatex:</span><br><span class="line">        image: overleafcep/sharelatex:6.0.1-ext-v3.3</span><br></pre></td></tr></table></figure>
+<p>image可以替换成最新版本，但是一定要跟<code>sharelatex/sharelatex</code>版本一致，如果你的社区基础版本是6.0.1，那这里一定要填<code>overleafcep/sharelatex:6.0.1-ext-v3.3</code>，其中6.0.1要和社区基础版本保持一致，ext-v3.3可以去dockerhub看最新的版本。</p>
+<blockquote>
+<p>6.0.1这个版本号必须一致！</p>
+</blockquote>
+<h3 id="overleaf-rc"><a href="#overleaf-rc" class="headerlink" title="overleaf.rc"></a>overleaf.rc</h3><p>这个文件里头有几个地方需要注意：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">OVERLEAF_LISTEN_IP=0.0.0.0	# ip需要改成全局</span><br><span class="line">OVERLEAF_PORT=80</span><br><span class="line">SERVER_PRO=true				# 一定要开启这个，因为要用到沙盒编译</span><br><span class="line">SIBLING_CONTAINERS_ENABLED=true	# 这个是需要手动填入的，开启沙盒编译功能</span><br></pre></td></tr></table></figure>
+<h3 id="variables-env"><a href="#variables-env" class="headerlink" title="variables.env"></a>variables.env</h3><p>这里头可以对overleaf版本做一些微调，网上都有，附一下我的一些关键配置：</p>
+<ol>
+<li><p>沙箱编译相关：我这里用的是<code>ghcr.io/ayaka-notes/texlive-full</code>镜像，仓库地址在<a target="_blank" rel="noopener" href="https://github.com/ayaka-notes/texlive-full">ayaka-notes/texlive-full: 🐳 Docker Image of TeXLive (For Overleaf Server Pro)</a>，这个镜像包含：</p>
+<ul>
+<li><a href="https://link.zhihu.com/?target=https%3A//fonts.google.com/">Google Fonts</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//packages.ubuntu.com/jammy/ttf-mscorefonts-installer">Microsoft msttcorefonts</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//www.overleaf.com/learn/latex/Questions/Which_OTF_or_TTF_fonts_are_supported_via_fontspec%3F">Overleaf supported fonts</a></li>
+<li>和Overleaf官网一样的latexmk编译流</li>
+<li>软件包系列：fontconfig、inkscape、pandoc、python3-pygments、wget、python3</li>
+<li>软件包系列：gnupg、gnuplot、perl-modules、perl、ca-certificates、git</li>
+<li>软件包系列：ghostscript、qpdf、r-base-core、tar</li>
+</ul>
+<p>很全，当然该作者还开发了overleaf pro，只不过有点年久失修，不然体验会比overleaf-CEP好很多。</p>
+<p>另外需要注意的是这里头不能有空格，尤其是逗号两边都不能有，否则会有bug</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">########################</span><br><span class="line">## Sandboxed Compiles ##</span><br><span class="line">########################</span><br><span class="line"></span><br><span class="line"># TEX_LIVE_DOCKER_IMAGE=quay.io/sharelatex/texlive-full:2022.1</span><br><span class="line"># ALL_TEX_LIVE_DOCKER_IMAGES=quay.io/sharelatex/texlive-full:2022.1,quay.io/sharelatex/texlive-full:2021.1,quay.io/sharelatex/texlive-full:2020.1</span><br><span class="line">ALL_TEX_LIVE_DOCKER_IMAGES=ghcr.io/ayaka-notes/texlive-full:2025.1,texlive/texlive:TL2024-historic</span><br><span class="line">ALL_TEX_LIVE_DOCKER_IMAGE_NAMES=TeXLive2025,TeXLive2024</span><br><span class="line">TEX_LIVE_DOCKER_IMAGE=ghcr.io/ayaka-notes/texlive-full:2025.1</span><br><span class="line">TEX_COMPILER_EXTRA_FLAGS=-shell-escape</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>模板相关：先把分类搭好，后面有好的模板可以直接内网共享。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">#################</span><br><span class="line">#   TEMPLATES   #</span><br><span class="line">#################</span><br><span class="line"></span><br><span class="line">ENABLE_CONVERSIONS=true</span><br><span class="line"></span><br><span class="line">OVERLEAF_TEMPLATE_GALLERY=true</span><br><span class="line">OVERLEAF_NON_ADMIN_CAN_PUBLISH_TEMPLATES=true</span><br><span class="line">OVERLEAF_TEMPLATE_CATEGORIES=academic-journal book presentation poster cv homework bibliography calendar formal-letter report thesis newsletter</span><br><span class="line"></span><br><span class="line">TEMPLATE_ACADEMIC_JOURNAL_NAME=Journal articles</span><br><span class="line">TEMPLATE_ACADEMIC_JOURNAL_DESCRIPTION=Templates for academic journal submissions, including formats for major publishers and preprint servers.</span><br><span class="line"></span><br><span class="line">TEMPLATE_BIBLIOGRAPHY_NAME=Bibliographies</span><br><span class="line">TEMPLATE_BIBLIOGRAPHY_DESCRIPTION=Styles for creating and managing bibliographies with BibTeX or BibLaTeX. Suitable for use in academic papers, theses, and reports.</span><br><span class="line"></span><br><span class="line">TEMPLATE_BOOK_NAME=Books</span><br><span class="line">TEMPLATE_BOOK_DESCRIPTION=Templates for writing books or long-form documents, including chapter structuring, front matter, and indexing.</span><br><span class="line"></span><br><span class="line">TEMPLATE_CALENDAR_NAME=Calendars</span><br><span class="line">TEMPLATE_CALENDAR_DESCRIPTION=Templates to create yearly, monthly, or weekly calendars. Useful for personal planners or event scheduling.</span><br><span class="line"></span><br><span class="line">TEMPLATE_CV_NAME=CVs and résumés</span><br><span class="line">TEMPLATE_CV_DESCRIPTION=Templates for CVs and résumés with various formats for academic, industry, and creative positions.</span><br><span class="line"></span><br><span class="line">TEMPLATE_FORMAL_LETTER_NAME=Formal letters</span><br><span class="line">TEMPLATE_FORMAL_LETTER_DESCRIPTION=Templates for professional letters, such as cover letters, recommendation letters, and official correspondence.</span><br><span class="line"></span><br><span class="line">TEMPLATE_HOMEWORK_NAME=Assignments</span><br><span class="line">TEMPLATE_HOMEWORK_DESCRIPTION=Templates for homework, coursework, and problem sets. Designed to be clean and well-structured for students and educators.</span><br><span class="line"></span><br><span class="line">TEMPLATE_NEWSLETTER_NAME=Newsletters</span><br><span class="line">TEMPLATE_NEWSLETTER_DESCRIPTION=Templates for creating newsletters with formats for academic, corporate, or community communications.</span><br><span class="line"></span><br><span class="line">TEMPLATE_POSTER_NAME=Posters</span><br><span class="line">TEMPLATE_POSTER_DESCRIPTION=Templates for scientific and academic posters, typically used in conferences and research presentations.</span><br><span class="line"></span><br><span class="line">TEMPLATE_PRESENTATION_NAME=Presentations</span><br><span class="line">TEMPLATE_PRESENTATION_DESCRIPTION=Templates for Beamer and other presentation formats, tailored for academic talks and lectures.</span><br><span class="line"></span><br><span class="line">TEMPLATE_REPORT_NAME=Reports</span><br><span class="line">TEMPLATE_REPORT_DESCRIPTION=Templates for technical, lab, or project reports. Includes sections for figures, tables, and references.</span><br><span class="line"></span><br><span class="line">TEMPLATE_THESIS_NAME=Theses</span><br><span class="line">TEMPLATE_THESIS_DESCRIPTION=Templates for writing theses and dissertations, following institutional formatting and citation guidelines.</span><br><span class="line"></span><br><span class="line">TEMPLATE_ALL_NAME=All templates</span><br><span class="line">TEMPLATE_ALL_DESCRIPTION=Browse a collection of all available LaTeX templates, categorized by document type, style, and purpose.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>剩下的邮箱和s3存储是必填项，都可以用cloudflare的免费方案，在此不表</p>
+<blockquote>
+<p>千万别用outlook，outlook的smtp不支持密码登录了，overleaf配置outlook的单应用密码依然会报错，微软官方给的方案是现在通关单密码登陆的邮箱应用只能收邮件，不能发邮件</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="重启并执行"><a href="#重启并执行" class="headerlink" title="重启并执行"></a>重启并执行</h2><p>修改完配置之后需要先停止容器，再重启</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin/stop</span><br><span class="line">bin/docker-compose down</span><br><span class="line">sudo bin/up -d</span><br></pre></td></tr></table></figure>
+<h1 id="Overleaf备份"><a href="#Overleaf备份" class="headerlink" title="Overleaf备份"></a>Overleaf备份</h1><p>数据无价，除了s3同步之外可靠备份也很重要，这里直接用<a target="_blank" rel="noopener" href="https://github.com/xuhe2/olsync">github.com/xuhe2/olsync</a></p>
+<h1 id="配置内网穿透"><a href="#配置内网穿透" class="headerlink" title="配置内网穿透"></a>配置内网穿透</h1><p>论文协作可能需要校外访问，所以可以进一步配置内网穿透，这里选择cloudflare Tunnel，并配置邮箱白名单访问权限。</p>
+<h2 id="配置cloudflare-Tunnel"><a href="#配置cloudflare-Tunnel" class="headerlink" title="配置cloudflare Tunnel"></a>配置cloudflare Tunnel</h2><p>参考链接：<a target="_blank" rel="noopener" href="https://linux.do/t/topic/3628">Cloudflare Zero Trust：Cloudflare Tunnel使用教程 - 资源荟萃 - LINUX DO</a></p>
+<h3 id="cf-tunnel-是什么？"><a href="#cf-tunnel-是什么？" class="headerlink" title="cf tunnel 是什么？"></a>cf tunnel 是什么？</h3><blockquote>
+<p>Cloudflare Tunnel为您提供了一种安全的方式，将您的资源连接到Cloudflare，而无需公共可路由的IP地址。使用Tunnel，您不会将流量发送到外部IP地址，而是在您的基础设施中创建一个轻量级的守护程序，仅向Cloudflare的全球网络创建出站连接。Cloudflare Tunnel可以安全地将HTTP Web服务器、SSH服务器、远程桌面和其他协议连接到Cloudflare。这样，您的源站可以通过Cloudflare提供流量，而不会容易受到绕过Cloudflare的攻击。</p>
+</blockquote>
+<p><em>（摘自官方文档）</em></p>
+<h3 id="有什么用？"><a href="#有什么用？" class="headerlink" title="有什么用？"></a>有什么用？</h3><p><code>tunnel</code>字面意思一根加密隧道直接从Cloudflare网络插到你的服务器，提供webui页面方便管理域名与服务器上部署的项目之间的绑定。</p>
+<ul>
+<li>项目部署上线更简单，只需建立好隧道，然后设置域名指向项目暴露的本地地址和端口即可。</li>
+<li>无需编写任何 Nginx 配置，非常适合像我这样的懒人或小白用户。</li>
+<li>无需配置证书，使用加密隧道，项目不会直接暴露到公网上，从而增强了安全性。<em>（ps: 需开启防火墙）</em></li>
+</ul>
+<h3 id="如何工作的？"><a href="#如何工作的？" class="headerlink" title="如何工作的？"></a>如何工作的？</h3><p>大致流程为：</p>
+<p>用户 —&gt; cf服务器 —&gt; cf侧tunnel设置入口 —(加密)–&gt; 服务器侧的tunnel出口 → 本机项目</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260109210014143.png" alt="image-20260109210014143"></p>
+<h3 id="开始搭建"><a href="#开始搭建" class="headerlink" title="开始搭建"></a>开始搭建</h3><ol>
+<li>在Cloudflare的侧边栏中，找到并点击<code>Zero Trust</code> 菜单。如果是首次使用，需要进行订阅，选择免费套餐进行开通。</li>
+</ol>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/ed995e3d-3924-40f7-8da2-0d2c7f5a939a.png" alt="ed995e3d-3924-40f7-8da2-0d2c7f5a939a"></p>
+<ol>
+<li>在进入Zero Trust面板后，从侧边栏中找到并点击<code>Tunnel</code> 菜单。</li>
+</ol>
+<p><img src="https://linux.do/uploads/default/original/2X/5/5c827c3bad07a645e7e07c2de17e81d59f89e15d.png" alt="2"></p>
+<p>2281×500 14.1 KB</p>
+<ol>
+<li>创建一条隧道（cf侧）</li>
+</ol>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/88b3a824-fb54-420d-ae52-c67eb961cb82.png" alt="88b3a824-fb54-420d-ae52-c67eb961cb82"></p>
+<p>​    3.1 隧道类型选<code>Cloudflared</code></p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/f5df19c1-3f4c-47bf-b181-ff3f7dfe5125.png" alt="f5df19c1-3f4c-47bf-b181-ff3f7dfe5125"></p>
+<p>​    3.2 设置隧道名，名字随便取，我个人习惯于取能够辨识服务器的名称。</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/1160bc76-c70f-459b-b7e8-ce28a9682a8c.png" alt="1160bc76-c70f-459b-b7e8-ce28a9682a8c"></p>
+<p>​    3.3 安装环境选<code>Docker</code>，记得复制docker的安装命令以备后用。</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/3b346934-a6f3-4a3a-ab64-bcf30f4a74ad.png" alt="3b346934-a6f3-4a3a-ab64-bcf30f4a74ad"></p>
+<p>​    3.4 不用点下一步，直接在左上角点击返回，即可确认隧道已成功创建。</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/f0d94135-3d3b-40c0-a39e-96d56a86699f.png" alt="f0d94135-3d3b-40c0-a39e-96d56a86699f"></p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/8b456ec2-e7dc-47b6-bce0-cab75560cb7e.png" alt="8b456ec2-e7dc-47b6-bce0-cab75560cb7e"></p>
+<ol>
+<li>服务器侧隧道设置</li>
+</ol>
+<p>在第<code>3.3</code>节中，我们获得了一个类似于以下的docker命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiMjQ4MmIzM2Y3Njc3YWE5OWE5NThiZjcxNTdkMzU1ZmYiLCJ0IjoiOTFmYzdhOWQtYThiZC00MmY2LThlOTEtMDMwYWZjNDA3MjRmIiwicyI6IlkyRm1OamM0TXpZdE1qVTBaaTAwTTJZNUxUZ3hOV1V0TXpOaE9XVmpNV1F4Wm1ZeCJ9</span><br></pre></td></tr></table></figure>
+<p>先别着急用，需要添加几个docker参数，<strong>注意network需要设置为host</strong>。讲一下我之前遇到的坑，docker启动容器默认会使用桥接模式（bridge），在后面域名绑定时，<code>127.0.0.1:port</code>是cloudflared这个容器内部的地址，如果你的项目也是使用docker的桥接模式启动的，那么就无法找到对应的服务。当然也可以用<code>172.17.0.1:port</code>这个地址进行绑定，但还是建议让cloudflared容器以host模式启动。</p>
+<p>docker启动命令</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart always --network host --name cloudflared cloudflare/cloudflared tunnel --no-autoupdate run --token eyJhIjoiMjQ4MmIzM2Y3Njc3YWE5OWE5NThiZjcxNTdkMzU1ZmYiLCJ0IjoiOTFmYzdhOWQtYThiZC00MmY2LThlOTEtMDMwYWZjNDA3MjRmIiwicyI6IlkyRm1OamM0TXpZdE1qVTBaaTAwTTJZNUxUZ3hOV1V0TXpOaE9XVmpNV1F4Wm1ZeCJ9</span><br></pre></td></tr></table></figure>
+<p>or</p>
+<p>docker-compose配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">cloudflared:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">cloudflare/cloudflared</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">cloudflared</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">network_mode:</span> <span class="string">host</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">tunnel</span> <span class="string">--no-autoupdate</span> <span class="string">run</span> <span class="string">--token</span> <span class="string">eyJhIjoiMjQ4MmIzM2Y3Njc3YWE5OWE5NThiZjcxNTdkMzU1ZmYiLCJ0IjoiOTFmYzdhOWQtYThiZC00MmY2LThlOTEtMDMwYWZjNDA3MjRmIiwicyI6IlkyRm1OamM0TXpZdE1qVTBaaTAwTTJZNUxUZ3hOV1V0TXpOaE9XVmpNV1F4Wm1ZeCJ9</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>配置域名和部署项目的绑定</li>
+</ol>
+<p>​    5.1 点击前面创建的隧道<code>Configure</code></p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/ed563914-9b7e-4cf6-a833-7b838a3ce7c6.png" alt="ed563914-9b7e-4cf6-a833-7b838a3ce7c6"></p>
+<p>​    5.2 添加<code>Public Hostname</code></p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/b219f066-cd90-475a-ab6f-66f54f87cae7.png" alt="b219f066-cd90-475a-ab6f-66f54f87cae7"></p>
+<p>​    5.3 配置域名与服务器上的项目端口，类型有很多可选的，选http即可。</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/1457b68a-52bb-4904-bbb0-a8190b1c5a7d.png" alt="1457b68a-52bb-4904-bbb0-a8190b1c5a7d"></p>
+<p>​    5.4 配置完成后，尝试访问你的域名以确认是否设置成功</p>
+<h2 id="配置邮件白名单"><a href="#配置邮件白名单" class="headerlink" title="配置邮件白名单"></a>配置邮件白名单</h2><p>参考链接：<a target="_blank" rel="noopener" href="https://www.emperinter.info/2023/09/21/cloudflare-zero-trust/">内网穿透新技能 - Cloudflare Zero Trust ► emperinter - emperinter</a></p>
+<p>现在我们已经可以从外部访问内网里的设备了，即便我们为每个服务加上了强壮的密码，你可能还是会担心密码遭到了泄露或者暴力破解。这时，可以利用 Zero Trust 提供的 Access 功能，来为你的服务增加二次验证。</p>
+<ol>
+<li>点击 Application 中的 Add an application，选择 Self-hosted。<br><img src="https://www.emperinter.info/wp-content/uploads/2023/09/wp_editor_md_9f13de276f2cd6659fbc57fed5d994fe.jpg" alt="img"></li>
+</ol>
+<ol>
+<li>设置好 Application name，subdomain，选择我们的 Domain，点击 Next。<br><img src="https://www.emperinter.info/wp-content/uploads/2023/09/wp_editor_md_a11eae896eec6d970c0350b44084bad1.jpg" alt="img"></li>
+<li>然后新建个策略并在你创建的应用程序里头选择这个策略，首先设置策略名称（Policy name），配置规则（Configure rules）这里我们设置的是Emails，Value 填写自己常用的邮箱。意思就是，访问的时候需要输入自己的邮箱来获取一个一次性的验证码，验证通过之后才允许访问我们的内网服务。这个功能可以很好的保护我们的内网的一些服务。比如我们希望将内网的测速服务映射到公网，但是只允许特定的人员访问，就可以添加特定的邮箱以及验证码来进行访问控制。<br><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260109223223728.png" alt="image-20260109223223728"></li>
+</ol>
+<ol>
+<li><p>然后在应用程序里头绑定做好的策略即可。<br><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260109223333812.png" alt="image-20260109223333812"></p>
+</li>
+<li><p>在应用程序里头的<code>登陆方法</code>里，请确认勾选One-time PIN</p>
+<p><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/image-20260109223500131.png" alt="image-20260109223500131"></p>
+</li>
+</ol>
+<ol>
+<li><p>最后点击保存（Save policy）就可以了。试试我们添加好的策略，会提示输入邮箱获取验证码。<br><img src="https://www.emperinter.info/wp-content/uploads/2023/09/wp_editor_md_198dca660b73d13850ec9ab9ceca2a25.jpg" alt="img"></p>
+</li>
+<li><p><strong>这里随便输入邮箱是获取不到验证码的</strong>，只有输入我们设置好的邮箱才可以。利用这个访问控制策略，就为我们暴露在公网上的服务添加了二次验证。</p>
+<p>访问的有效期可以在应用程序里面的Session duration 中设置。<br><img src="https://www.emperinter.info/wp-content/uploads/2023/09/wp_editor_md_287c18492375f0ade667a61d439d0890.jpg" alt="img"></p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn">HPShark</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/">https://www.happyshark.cn/2026/01/08/实验室内网部署本地overleaf-CEP/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.happyshark.cn" target="_blank">Happy Shark</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8A%80%E6%9C%AF/">技术</a><a class="post-meta__tags" href="/tags/%E7%BD%91%E7%BB%9C/">网络</a></div><div class="post_share"><div class="social-share" data-image="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260108170557.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"><img class="cover" src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/20251106163319.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"><img class="cover" src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/20251106163319.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-06</div><div class="title">ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</div></div></a></div><div><a href="/2024/12/02/%E7%94%B2%E9%AA%A8%E6%96%87%E6%A2%AF%E5%AD%90%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/" title="甲骨文x-ui搭建过程笔记"><img class="cover" src="https://blogimages.happyshark.cn/%E7%94%B2%E9%AA%A8%E6%96%87x-ui%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B%E7%AC%94%E8%AE%B0/20251015112100.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-02</div><div class="title">甲骨文x-ui搭建过程笔记</div></div></a></div><div><a href="/2022/05/31/jsdelivr%E8%A2%AB%E5%A2%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90github%E5%9B%BE%E5%BA%8A%E9%98%B2%E6%AD%A2%E8%A2%ABdns%E6%B1%A1%E6%9F%93/" title="jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染"><img class="cover" src="https://blogimages.happyshark.cn/jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染/20220531165328.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-31</div><div class="title">jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染</div></div></a></div><div><a href="/2022/05/10/SNNU%E6%A0%A1%E5%9B%AD%E7%BD%91%E7%99%BD%E5%AB%96&%E6%A0%A1%E5%9B%AD%E7%BD%91nas%E6%90%AD%E5%BB%BA%E6%8C%87%E5%8D%97/" title="SNNU校园网白嫖&amp;校园网nas搭建指南"><img class="cover" src="https://blogimages.happyshark.cn/SNNU校园网白嫖&校园网nas搭建指南/结构.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-10</div><div class="title">SNNU校园网白嫖&amp;校园网nas搭建指南</div></div></a></div><div><a href="/2021/10/16/Win1011%E7%BD%91%E7%BB%9C%E6%96%AD%E8%BF%9E%EF%BC%8C%E6%97%A0%E7%BD%91%E7%BB%9C%E5%8E%9F%E5%9B%A0%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/" title="Win10&#x2F;11 网络断连，无网络原因及解决方法"><img class="cover" src="https://blogimages.happyshark.cn/win10无网络/20211016114109.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-10-16</div><div class="title">Win10&#x2F;11 网络断连，无网络原因及解决方法</div></div></a></div><div><a href="/2021/10/02/%E5%BC%80%E6%9C%BA%E6%89%A7%E8%A1%8Cpython%E8%84%9A%E6%9C%AC%E8%87%AA%E5%8A%A8%E7%99%BB%E5%BD%95SNNU%E6%A0%A1%E5%9B%AD%E7%BD%91/" title="开机执行python脚本自动登录SNNU校园网"><img class="cover" src="https://blogimages.happyshark.cn/登录snnu/20211002200835.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-10-02</div><div class="title">开机执行python脚本自动登录SNNU校园网</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">HPShark</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/HPShark"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:happyshark520@outlook.com" target="_blank" title="Email"><i class="fa fa-envelope"></i></a><a class="social-icon" href="/atom.xml" target="_blank" title="RSS"><i class="fa fa-rss"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">感谢访问，欢迎交换友链~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#overleaf-%E9%85%8D%E7%BD%AE"><span class="toc-number">1.</span> <span class="toc-text">overleaf 配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E5%8F%B0%E5%B9%B2%E5%87%80%E7%9A%84ubuntu%E6%9C%BA%E5%AD%90%E5%B9%B6%E5%AE%89%E8%A3%85%E5%A5%BDdocker"><span class="toc-number">1.1.</span> <span class="toc-text">开台干净的ubuntu机子并安装好docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%AE%89%E8%A3%85%E5%B7%A5%E5%85%B7"><span class="toc-number">1.2.</span> <span class="toc-text">获取安装工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">1.3.</span> <span class="toc-text">设置配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%89%E5%8F%96-%E5%88%9B%E5%BB%BA%E5%A2%9E%E5%BC%BA%E7%89%88%E9%95%9C%E5%83%8F"><span class="toc-number">1.4.</span> <span class="toc-text">拉取&#x2F;创建增强版镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-dockerd-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">1.4.1.</span> <span class="toc-text">修改 dockerd 配置文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">1.5.</span> <span class="toc-text">修改配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#docker-compose-override-yml"><span class="toc-number">1.5.1.</span> <span class="toc-text">docker-compose.override.yml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#overleaf-rc"><span class="toc-number">1.5.2.</span> <span class="toc-text">overleaf.rc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#variables-env"><span class="toc-number">1.5.3.</span> <span class="toc-text">variables.env</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%90%AF%E5%B9%B6%E6%89%A7%E8%A1%8C"><span class="toc-number">1.6.</span> <span class="toc-text">重启并执行</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Overleaf%E5%A4%87%E4%BB%BD"><span class="toc-number">2.</span> <span class="toc-text">Overleaf备份</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F"><span class="toc-number">3.</span> <span class="toc-text">配置内网穿透</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEcloudflare-Tunnel"><span class="toc-number">3.1.</span> <span class="toc-text">配置cloudflare Tunnel</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#cf-tunnel-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">3.1.1.</span> <span class="toc-text">cf tunnel 是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="toc-number">3.1.2.</span> <span class="toc-text">有什么用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F"><span class="toc-number">3.1.3.</span> <span class="toc-text">如何工作的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA"><span class="toc-number">3.1.4.</span> <span class="toc-text">开始搭建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%82%AE%E4%BB%B6%E7%99%BD%E5%90%8D%E5%8D%95"><span class="toc-number">3.2.</span> <span class="toc-text">配置邮件白名单</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/" title="实验室内网部署本地overleaf-CEP"><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260108170557.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="实验室内网部署本地overleaf-CEP"/></a><div class="content"><a class="title" href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/" title="实验室内网部署本地overleaf-CEP">实验室内网部署本地overleaf-CEP</a><time datetime="2026-01-07T16:00:00.000Z" title="发表于 2026-01-08 00:00:00">2026-01-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"><img src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/20251106163319.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"/></a><div class="content"><a class="title" href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案">ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</a><time datetime="2025-11-05T16:00:00.000Z" title="发表于 2025-11-06 00:00:00">2025-11-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/22/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B-%E7%AC%94%E8%AE%B0/" title="不安全的实例"><img src="https://blogimages.happyshark.cn/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B/F6fbBd.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="不安全的实例"/></a><div class="content"><a class="title" href="/2025/04/22/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B-%E7%AC%94%E8%AE%B0/" title="不安全的实例">不安全的实例</a><time datetime="2025-04-21T16:00:00.000Z" title="发表于 2025-04-22 00:00:00">2025-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/" title="链上链下融合协议的安全证明方式分析"><img src="https://blogimages.happyshark.cn/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/20250121123819.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="链上链下融合协议的安全证明方式分析"/></a><div class="content"><a class="title" href="/2025/01/23/%E9%93%BE%E4%B8%8A%E9%93%BE%E4%B8%8B%E8%9E%8D%E5%90%88%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%89%E5%85%A8%E8%AF%81%E6%98%8E%E6%96%B9%E5%BC%8F%E5%88%86%E6%9E%90/" title="链上链下融合协议的安全证明方式分析">链上链下融合协议的安全证明方式分析</a><time datetime="2025-01-22T16:00:00.000Z" title="发表于 2025-01-23 00:00:00">2025-01-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/01/13/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/" title="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）"><img src="https://blogimages.happyshark.cn/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/20250113232341.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）"/></a><div class="content"><a class="title" href="/2025/01/13/%E4%B8%AD%E6%96%87latex%E8%AE%BA%E6%96%87%E4%BF%AE%E8%AE%A2%E6%96%B9%E6%B3%95%E6%B1%87%E6%80%BB/" title="中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）">中文latex论文修订方法汇总（changes包方式，latexdiff指令，中文乱码解决）</a><time datetime="2025-01-12T16:00:00.000Z" title="发表于 2025-01-13 00:00:00">2025-01-13</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2016 - 2026 By HPShark</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">有问题为什么不问问神奇的海螺呢？</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js" type="module"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.5.0/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const loadUtterances = () => {
+    let ele = document.createElement('script')
+    ele.id = 'utterances_comment'
+    ele.src = 'https://utteranc.es/client.js'
+    ele.setAttribute('repo', 'HPShark/blogcomment')
+    ele.setAttribute('issue-term', 'title')
+    const nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+    ele.setAttribute('theme', nowTheme)
+    ele.crossOrigin = 'anonymous'
+    ele.async = true
+    document.getElementById('utterances-wrap').appendChild(ele)
+  }
+
+  const utterancesTheme = theme => {
+    const iframe = document.querySelector('.utterances-frame')
+    if (iframe) {
+      const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+      const message = {
+        type: 'set-theme',
+        theme: theme
+      };
+      iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+    }
+  }
+
+  btf.addGlobalFn('themeChange', utterancesTheme, 'utterances')
+
+  if ('Utterances' === 'Utterances' || !false) {
+    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+    else loadUtterances()
+  } else {
+    window.loadOtherComment = loadUtterances
+  }
+})()</script></div><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const findTrueUrl = (array) => {
+    Promise.all(array.map(item =>
+      fetch(item.url).then(resp => resp.json()).then(data => {
+        const urlArray = data.body.match(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/ig)
+        if (data.user.login === 'utterances-bot') {
+          return urlArray.pop()
+        } else {
+          return urlArray.shift()
+        }
+      })
+    )).then(res => {
+        array = array.map((i,index)=> {
+          return {
+            ...i,
+            url: res[index]
+          }
+        })
+
+        saveToLocal.set('github-newest-comments', JSON.stringify(array), 10/(60*24))
+        generateHtml(array)
+    });
+  }
+
+  const getComment = () => {
+    fetch('https://api.github.com/repos/HPShark/blogcomment/issues/comments?sort=updated&direction=desc&per_page=6&page=1',{
+      "headers": {
+        Accept: 'application/vnd.github.v3.html+json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const githubArray = data.map(item => {
+          return {
+            'avatar': item.user.avatar_url,
+            'content': changeContent(item.body_html),
+            'nick': item.user.login,
+            'url': item.issue_url,
+            'date': item.updated_at,
+            'githubUrl': item.html_url
+          }
+        })
+        findTrueUrl(githubArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.textContent= "无法获取评论，请确认相关配置是否正确"
+      })
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('github-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><div class="aplayer no-destroy" data-id="321805866" data-server="netease" data-order="random" data-type="playlist" data-mini="true" data-fixed="true" data-autoplay="true"> </div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-nest.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/click-show-text.min.js" data-mobile="true" data-text="计算机,豆浆机,榨汁机,传真机,汽轮机,内燃机,灭火机,掘土机,扩音机,截击机,教练机,舰载机,录音机,録音机,录像机,录影机,留声机,离心机,老虎机,冷冻机,歼击机,交换机,鼓风机,轰炸机,滑翔机,发电机,放映机,法郎机,发动机,反潜机,发报机,缝纫机,复印机,锅驼机,滚齿机,油印机,永动机,轧道机,轧钢机,凿岩机,运输机,榨油机,轧染机,战斗机,直升机,织布机,制冷机,照相机,侦察机,装载机,缫丝机,坐飞机,钻探机,钻井机,涡轮机,洗衣机,压路机,压缩机,旋翼机,压力机,心肺机,扬谷机,预警机,曳引机,速印机,通风机,透平机,送风机,拖拉机,推土机,脱粒机,小军机,寻呼机,打桩机,打印机,打字机,打火机,电话机,铲土机,柴油机,吹风机,耳塞机,电唱机,电报机,杜德机,电视机,电动机,对撞机,对讲机,放像机,动力机,订书机,铲运机,步谈机,报话机,步话机,播种机,伞翼机,扇风机,扫除机,爆炸机,收报机,摄像机,收录机,收音机,升降机,视盘机,升船机,说兵机,水轮机,顺风机,水上飞机,收发信机,数码相机,数字相机,生态危机,审势相机,暗藏杀机,傻里巴机,傻里八机,白费心机,剥复之机,财政危机,不失时机,持重待机,犯罪动机,喘息之机,东条英机,倒纻翻机,错过时机,枉费心机,枉用心机,微特电机,天赐良机,通险畅机,随物应机,贻误军机,一日万机,一线生机,斜翼飞机,泄露天机,鸭式飞机,泄漏天机,袖里玄机,坐失事机,坐失良机,走漏天机,运策决机,用尽心机,语不投机,光计算机,购买动机,观变沉机,工作母机,费尽心机,反潜飞机,话不投机,航天飞机,火箭飞机,活泼天机,漏泄天机,可乘之机,静不露机,经济危机,决胜之机,将机就机,空天飞机,军用飞机,鸥鸟忘机,妙算神机,鸥鹭忘机,日理万机,燃气轮机,施关发机,日有万机,煞费心机,全天候飞机,汽轮发电机,喷气式飞机,喷气发动机,联合收割机,卡式录音机,绝热发动机,空气压缩机,空中加油机,火箭发动机,轮式拖拉机,活塞式飞机,航空发动机,海军轰炸机,反潜直升机,分时计算机,异步发电机,异步电动机,直流发电机,直流电动机,中央处理机,中华学习机,专用计算机,自动取款机,自动柜员机,武装直升机,亚声速飞机,外围处理机,同步电动机,通用计算机,同步发电机,网络计算机,微型计算机,电影放映机,电影摄影机,电视摄影机,单板计算机,调频收音机,电子计算机,电视接收机,电子游戏机,超声速飞机,实时计算机,手扶拖拉机,水轮发电机,数据流计算机,变后掠翼飞机,电子对抗飞机,无人驾驶飞机,混凝土搅拌机,工业用拖拉机,混凝土振捣机,履带式拖拉机,控制流计算机,空气喷气发动机,卡拉ok伴唱机,涡轮螺旋桨飞机,单片微型计算机,电子数字计算机,电子模拟计算机,第三代电子计算机,第四代电子计算机,第五代电子计算机,第一代电子计算机,第二代电子计算机,活塞式航空发动机,混合式电子计算机,难得者时，易失者机,垂直和短距起落飞机,善观风色，善择时机,双水内冷汽轮发电机" data-fontsize="15px" data-random="false" async="async"></script><div class="fb-customerchat" id="fb-customer-chat" page_id="106213005918479" attribution="biz_inbox"></div><script>(() => {
+  document.getElementById('fb-root') ? '' : document.body.insertAdjacentHTML('afterend', '<div id="fb-root"></div>')
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml: true,
+      version: 'v16.0'
+    });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/zh_CN/sdk/xfbml.customerchat.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  const isChatBtn = true
+  const isChatHideShow = true
+
+  if (isChatBtn) {
+    window.chatBtnFn = () => {
+      const isShow = document.querySelector('.fb_customer_chat_bounce_in_v2')
+      isShow ? FB.CustomerChat.hide() : FB.CustomerChat.show()
+    }
+  } else if (isChatHideShow) {
+    window.chatBtn = {
+      hide: () => {
+        FB.CustomerChat.hide()
+      },
+      show: () => {
+        FB.CustomerChat.show(false)
+      }
+    }
+  }
+})()</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/metingjs/dist/Meting.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/Gallery/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'UA-116830180-1', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":120,"height":240,"hOffset":30},"mobile":{"show":true}});</script></body></html>
