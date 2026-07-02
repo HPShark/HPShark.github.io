@@ -201,10 +201,12 @@ document.addEventListener('pjax:send', () => {
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install firewalld -y</span><br><span class="line">sudo firewall-cmd --zone=public --permanent \</span><br><span class="line">--add-port=22/tcp --add-port=22/udp \</span><br><span class="line">--add-port=80/tcp --add-port=80/udp \</span><br><span class="line">--add-port=443/tcp --add-port=443/udp \</span><br><span class="line">--add-port=2053/tcp --add-port=2053/udp \</span><br><span class="line">--add-port=2083/tcp --add-port=2083/udp \</span><br><span class="line">--add-port=8087/tcp --add-port=8087/udp \</span><br><span class="line">--add-port=2096/tcp --add-port=2096/udp \</span><br><span class="line">--add-port=8443/tcp --add-port=8443/udp</span><br><span class="line">sudo firewall-cmd --reload</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p><strong>上面的命令一定要一个一个执行！</strong></p>
-<p>查看防火墙状态：sudo firewall-cmd —zone=public —list-ports</p>
-<p>查看防火墙当前规则：sudo firewall-cmd —list-all</p>
-<p>确认特定端口是否开放：sudo firewall-cmd —zone=public —query-port=2083/tcp</p>
 </blockquote>
+<ul>
+<li>查看防火墙状态：sudo firewall-cmd —zone=public —list-ports</li>
+<li>查看防火墙当前规则：sudo firewall-cmd —list-all</li>
+<li>确认特定端口是否开放：sudo firewall-cmd —zone=public —query-port=8080/tcp</li>
+</ul>
 <p><strong>然后重启服务器</strong>！！！！</p>
 <h2 id="系统初始化配置"><a href="#系统初始化配置" class="headerlink" title="系统初始化配置"></a>系统初始化配置</h2><ol>
 <li><p>设置时间：</p>
