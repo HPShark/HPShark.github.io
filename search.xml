@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>esxi硬盘精简置备、厚置备切换</title>
+      <link href="/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/"/>
+      <url>/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/</url>
+      
+        <content type="html"><![CDATA[<hr><p>实验室新到了一台esxi服务器，但是供货商安装的系统磁盘用的厚置备，现在需要转换一下省点空间方便备份，否则厚置备500G的系统全量往机械盘冷备份太慢了o(╥﹏╥)o，从网上找了个视频教程，整理成文档方便后续直接复制指令。</p><p>教程参考视频：<a href="https://www.youtube.com/watch?v=V3bJtvWAz4Q">ESXi存储空间不够用？试试这个方法吧！虚拟硬盘置备模式转换教程~ - YouTube</a>，解释了精简置备和厚置备的切换方法，这里我只需要厚置备转精简置备即可。</p><h2 id="预备措施"><a href="#预备措施" class="headerlink" title="预备措施"></a>预备措施</h2><p>请先确保以下操作已经完成：</p><ul><li>待更改的虚拟机已经关机</li><li>删除所有快照</li><li>ESXI已经置于维护模式</li><li>剩余的存储空间要大于待转换的磁盘文件大小（要用个临时文件，大小和待转换的vmdk大小相同）</li></ul><h2 id="精简置备—-gt-厚置备、置零"><a href="#精简置备—-gt-厚置备、置零" class="headerlink" title="精简置备—-&gt;厚置备、置零"></a>精简置备—-&gt;厚置备、置零</h2><p>精简置备转厚置备是最简单的，只需要在<code>数据存储浏览器-虚拟机目录下-xxx.vmdk</code>右键，点击扩充硬盘即可</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912000552013.png" alt="image-20260912000552013"></p><p>扩充完之后重启esxi，即可将磁盘改成厚置备。</p><h2 id="厚置备、延迟置零—-gt-厚置备、置零"><a href="#厚置备、延迟置零—-gt-厚置备、置零" class="headerlink" title="厚置备、延迟置零—-&gt;厚置备、置零"></a>厚置备、延迟置零—-&gt;厚置备、置零</h2><p>使用<code>vmkfstools</code>命令进行切换：</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912001357770.png" alt="image-20260912001357770"></p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vmkfstools -k/vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/ubuntu22.04.vmdk</span><br></pre></td></tr></table></figure><blockquote><p>vmkfstools是磁盘管理指令</p><p>-k是参数</p><p>/vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/ubuntu22.04.vmdk 是你要改的磁盘的真实地址，盘的地址可以在存储里看，然后再跟上磁盘文件的目录就行</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912001756699.png" alt="image-20260912001756699"></p></blockquote><p>扩充完之后重启esxi，即可将磁盘改成厚置备、置零。</p><h2 id="厚置备—-gt-精简置备"><a href="#厚置备—-gt-精简置备" class="headerlink" title="厚置备—-&gt;精简置备"></a>厚置备—-&gt;精简置备</h2><p>该转换方法原理是新建一个精简置备的vmdk 然后再把原来的删掉，之后在重命名即可。</p><ol><li><p>可以看到现在磁盘还是厚置备。<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912004303810.png" alt="image-20260912004303810"></p></li><li><p>通过ssh进入后台的vmdk所在目录：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/</span><br></pre></td></tr></table></figure></li><li><p>执行vmkfstools指令：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vmkfstools -i ubuntu22.04.vmdk -d thin ubuntu22.04_thin.vmdk</span><br></pre></td></tr></table></figure><blockquote><p>-i ubuntu22.04.vmdk 是原磁盘文件</p><p>-d thin ubuntu22.04_thin.vmdk 是新生成的磁盘文件</p><p>thin表示生成一个精简置备的跳转硬盘，其他指令如下：<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912002717732.png" alt="image-20260912002717732"></p></blockquote></li><li><p>在web端数据存储浏览里头可以看到，精简置备的硬盘只有28G（实际数据大小）<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912002832576.png" alt="image-20260912002832576"></p></li><li><p>删除原来的500Gvmdk文件，刷新之后会出来一个-flat.vmdk文件，需要一并删除<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003133842.png" alt="image-20260912003133842"><br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003201905.png" alt="image-20260912003201905"></p><blockquote><p>.vmdk文件只是链接文件，是快捷方式，-flat.vmdk才是真正储存数据的地方</p></blockquote></li><li><p>在ssh里头使用mv命令把新文件重命名成原来的</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv ubuntu22.04_thin.vmdk ubuntu22.04.vmdk</span><br></pre></td></tr></table></figure><blockquote><ol><li>重命名只是重命名vmdk，-flat.vmdk的数据文件还是原来的</li><li>ubuntu22.04.vmdk作为链接文件里头已经写明指向ubuntu22.04_thin-flat.vmdk了，所以ubuntu22.04_thin-flat.vmdk这个文件<strong>不能重命名</strong>！</li></ol><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003911354.png" alt="image-20260912003911354"></p></blockquote></li><li><p>重启esxi，就可以看到磁盘变成精简置备了</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912005011837.png" alt="image-20260912005011837"></p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 技术 </tag>
+            
+            <tag> 网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>实验室内网部署本地overleaf-CEP</title>
       <link href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/"/>
       <url>/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/</url>
@@ -567,6 +594,56 @@
     
     
     <entry>
+      <title>炒扇贝肉</title>
+      <link href="/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/"/>
+      <url>/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/</url>
+      
+        <content type="html"><![CDATA[<hr><ol><li><p>把贝壳肉清理出来，去掉内胆杂质</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151231250.png" alt="image-20220210151231250"></p></li><li><p>锅里加油，放姜和辣椒抄一抄出锅备用</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151256350.png" alt="image-20220210151256350"></p></li><li><p>加油放葱姜香锅，放扇贝肉炒熟，改中火加酱油调色，耗油调味，料酒去腥</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151314665.png" alt="image-20220210151314665"></p></li><li><p>把辣椒加进去拌开，尝尝咸淡，淡的话可以加点盐。小火收汁出锅</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151339498.png" alt="image-20220210151339498"></p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 厨房里的秘密 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 家的味道 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>炒烤肉</title>
+      <link href="/2022/02/10/%E7%82%92%E7%83%A4%E8%82%89/"/>
+      <url>/2022/02/10/%E7%82%92%E7%83%A4%E8%82%89/</url>
+      
+        <content type="html"><![CDATA[<hr><ol><li><p>羊肉拿出来化成半冻状态，切片</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151607906.png" alt="image-20220210151607906"></p></li><li><p>可选步骤：如果想吃软一点的烤肉可在肉里面加些勾芡淀粉，抓一抓拌匀</p><blockquote><p>就和揉面一样把肉放到盆里，然后加点淀粉开始揉，揉开就ok</p></blockquote></li><li><p>锅里放油防粘锅（看一下肥肉多不多，多的话油可以少放点），放肉小火炒</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151726064.png" alt="image-20220210151726064"></p></li><li><p>炒到变色，放点盐，辣椒面</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151756289.png" alt="image-20220210151756289"></p></li><li><p>炒熟，在放孜然，关火拌开出锅</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151817390.png" alt="image-20220210151817390"></p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 厨房里的秘密 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 家的味道 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>红烧多宝鱼</title>
       <link href="/2022/02/10/%E7%BA%A2%E7%83%A7%E5%A4%9A%E5%AE%9D%E9%B1%BC/"/>
       <url>/2022/02/10/%E7%BA%A2%E7%83%A7%E5%A4%9A%E5%AE%9D%E9%B1%BC/</url>
@@ -617,36 +694,11 @@
     
     
     <entry>
-      <title>炒烤肉</title>
-      <link href="/2022/02/10/%E7%82%92%E7%83%A4%E8%82%89/"/>
-      <url>/2022/02/10/%E7%82%92%E7%83%A4%E8%82%89/</url>
+      <title>清蒸贝壳</title>
+      <link href="/2022/02/09/%E6%B8%85%E8%92%B8%E8%B4%9D%E5%A3%B3/"/>
+      <url>/2022/02/09/%E6%B8%85%E8%92%B8%E8%B4%9D%E5%A3%B3/</url>
       
-        <content type="html"><![CDATA[<hr><ol><li><p>羊肉拿出来化成半冻状态，切片</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151607906.png" alt="image-20220210151607906"></p></li><li><p>可选步骤：如果想吃软一点的烤肉可在肉里面加些勾芡淀粉，抓一抓拌匀</p><blockquote><p>就和揉面一样把肉放到盆里，然后加点淀粉开始揉，揉开就ok</p></blockquote></li><li><p>锅里放油防粘锅（看一下肥肉多不多，多的话油可以少放点），放肉小火炒</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151726064.png" alt="image-20220210151726064"></p></li><li><p>炒到变色，放点盐，辣椒面</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151756289.png" alt="image-20220210151756289"></p></li><li><p>炒熟，在放孜然，关火拌开出锅</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151817390.png" alt="image-20220210151817390"></p></li></ol>]]></content>
-      
-      
-      <categories>
-          
-          <category> 厨房里的秘密 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 家的味道 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>炒扇贝肉</title>
-      <link href="/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/"/>
-      <url>/2022/02/10/%E7%82%92%E6%89%87%E8%B4%9D%E8%82%89/</url>
-      
-        <content type="html"><![CDATA[<hr><ol><li><p>把贝壳肉清理出来，去掉内胆杂质</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151231250.png" alt="image-20220210151231250"></p></li><li><p>锅里加油，放姜和辣椒抄一抄出锅备用</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151256350.png" alt="image-20220210151256350"></p></li><li><p>加油放葱姜香锅，放扇贝肉炒熟，改中火加酱油调色，耗油调味，料酒去腥</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151314665.png" alt="image-20220210151314665"></p></li><li><p>把辣椒加进去拌开，尝尝咸淡，淡的话可以加点盐。小火收汁出锅</p><p><img src="https://blogimages.happyshark.cn/food/image-20220210151339498.png" alt="image-20220210151339498"></p></li></ol>]]></content>
+        <content type="html"><![CDATA[<hr><ol><li><p>清洗一下贝壳肉</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209225923639.png" alt=""></p></li><li><p>清水煮一碗粉丝</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230241958.png" alt="image-20220209230241958"></p></li><li><p>调汁：葱姜耗油水料酒生抽</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230307708.png" alt="image-20220209230307708"></p></li><li><p>每个贝壳上面放点粉丝，再加汁，上蒸锅，加水大火蒸六到十分钟</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230341168.png" alt="image-20220209230341168"></p></li><li><p>关火出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230404457.png" alt="image-20220209230404457"></p></li></ol>]]></content>
       
       
       <categories>
@@ -717,31 +769,6 @@
     
     
     <entry>
-      <title>红烧鱼</title>
-      <link href="/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/"/>
-      <url>/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/</url>
-      
-        <content type="html"><![CDATA[<hr><ol><li><p>把鱼鳃 内胆 鱼鳞处理好，抹盐淹一会</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120226539.png" alt="image-20220210120226539"></p></li><li><p>锅里倒油至冒烟放鱼煎一下（油热不粘锅）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120402098.png" alt="image-20220210120402098"></p></li><li><p>放酱油，料酒，耗油，葱，蒜，可选辣椒，然后改小火，盖上锅盖炖到水干（大概七八分钟）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120419613.png" alt="image-20220210120419613"></p></li><li><p>4分钟左右可以开锅尝一下咸淡，加盐，放点白糖提鲜继续炖，熟了之后改大火收汁</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120439074.png" alt="image-20220210120439074"></p></li><li><p>最后再加点葱提色，鸡精提鲜，出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120458363.png" alt="image-20220210120458363"></p></li></ol>]]></content>
-      
-      
-      <categories>
-          
-          <category> 厨房里的秘密 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 家的味道 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>红烧虾</title>
       <link href="/2022/02/09/%E7%BA%A2%E7%83%A7%E8%99%BE/"/>
       <url>/2022/02/09/%E7%BA%A2%E7%83%A7%E8%99%BE/</url>
@@ -767,11 +794,11 @@
     
     
     <entry>
-      <title>清蒸贝壳</title>
-      <link href="/2022/02/09/%E6%B8%85%E8%92%B8%E8%B4%9D%E5%A3%B3/"/>
-      <url>/2022/02/09/%E6%B8%85%E8%92%B8%E8%B4%9D%E5%A3%B3/</url>
+      <title>红烧鱼</title>
+      <link href="/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/"/>
+      <url>/2022/02/09/%E7%BA%A2%E7%83%A7%E9%B1%BC/</url>
       
-        <content type="html"><![CDATA[<hr><ol><li><p>清洗一下贝壳肉</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209225923639.png" alt=""></p></li><li><p>清水煮一碗粉丝</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230241958.png" alt="image-20220209230241958"></p></li><li><p>调汁：葱姜耗油水料酒生抽</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230307708.png" alt="image-20220209230307708"></p></li><li><p>每个贝壳上面放点粉丝，再加汁，上蒸锅，加水大火蒸六到十分钟</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230341168.png" alt="image-20220209230341168"></p></li><li><p>关火出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220209230404457.png" alt="image-20220209230404457"></p></li></ol>]]></content>
+        <content type="html"><![CDATA[<hr><ol><li><p>把鱼鳃 内胆 鱼鳞处理好，抹盐淹一会</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120226539.png" alt="image-20220210120226539"></p></li><li><p>锅里倒油至冒烟放鱼煎一下（油热不粘锅）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120402098.png" alt="image-20220210120402098"></p></li><li><p>放酱油，料酒，耗油，葱，蒜，可选辣椒，然后改小火，盖上锅盖炖到水干（大概七八分钟）</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120419613.png" alt="image-20220210120419613"></p></li><li><p>4分钟左右可以开锅尝一下咸淡，加盐，放点白糖提鲜继续炖，熟了之后改大火收汁</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120439074.png" alt="image-20220210120439074"></p></li><li><p>最后再加点葱提色，鸡精提鲜，出锅</p><p><img src="https://blogimages.happyshark.cn//food/image-20220210120458363.png" alt="image-20220210120458363"></p></li></ol>]]></content>
       
       
       <categories>

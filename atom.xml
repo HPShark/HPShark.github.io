@@ -6,7 +6,7 @@
   <link href="https://www.happyshark.cn/atom.xml" rel="self"/>
   
   <link href="https://www.happyshark.cn/"/>
-  <updated>2026-01-08T16:00:00.000Z</updated>
+  <updated>2026-09-10T16:00:00.000Z</updated>
   <id>https://www.happyshark.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>esxi硬盘精简置备、厚置备切换</title>
+    <link href="https://www.happyshark.cn/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/"/>
+    <id>https://www.happyshark.cn/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/</id>
+    <published>2026-09-10T16:00:00.000Z</published>
+    <updated>2026-09-10T16:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr><p>实验室新到了一台esxi服务器，但是供货商安装的系统磁盘用的厚置备，现在需要转换一下省点空间方便备份，否则厚置备500G的系统全量往机械盘冷备份太慢了o(╥﹏╥)o，从网上找了个视频教程，整理成文档方便后续直接复制指令。</p><p>教程参考视频：<a href="https://www.youtube.com/watch?v=V3bJtvWAz4Q">ESXi存储空间不够用？试试这个方法吧！虚拟硬盘置备模式转换教程~ - YouTube</a>，解释了精简置备和厚置备的切换方法，这里我只需要厚置备转精简置备即可。</p><h2 id="预备措施"><a href="#预备措施" class="headerlink" title="预备措施"></a>预备措施</h2><p>请先确保以下操作已经完成：</p><ul><li>待更改的虚拟机已经关机</li><li>删除所有快照</li><li>ESXI已经置于维护模式</li><li>剩余的存储空间要大于待转换的磁盘文件大小（要用个临时文件，大小和待转换的vmdk大小相同）</li></ul><h2 id="精简置备—-gt-厚置备、置零"><a href="#精简置备—-gt-厚置备、置零" class="headerlink" title="精简置备—-&gt;厚置备、置零"></a>精简置备—-&gt;厚置备、置零</h2><p>精简置备转厚置备是最简单的，只需要在<code>数据存储浏览器-虚拟机目录下-xxx.vmdk</code>右键，点击扩充硬盘即可</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912000552013.png" alt="image-20260912000552013"></p><p>扩充完之后重启esxi，即可将磁盘改成厚置备。</p><h2 id="厚置备、延迟置零—-gt-厚置备、置零"><a href="#厚置备、延迟置零—-gt-厚置备、置零" class="headerlink" title="厚置备、延迟置零—-&gt;厚置备、置零"></a>厚置备、延迟置零—-&gt;厚置备、置零</h2><p>使用<code>vmkfstools</code>命令进行切换：</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912001357770.png" alt="image-20260912001357770"></p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vmkfstools -k/vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/ubuntu22.04.vmdk</span><br></pre></td></tr></table></figure><blockquote><p>vmkfstools是磁盘管理指令</p><p>-k是参数</p><p>/vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/ubuntu22.04.vmdk 是你要改的磁盘的真实地址，盘的地址可以在存储里看，然后再跟上磁盘文件的目录就行</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912001756699.png" alt="image-20260912001756699"></p></blockquote><p>扩充完之后重启esxi，即可将磁盘改成厚置备、置零。</p><h2 id="厚置备—-gt-精简置备"><a href="#厚置备—-gt-精简置备" class="headerlink" title="厚置备—-&gt;精简置备"></a>厚置备—-&gt;精简置备</h2><p>该转换方法原理是新建一个精简置备的vmdk 然后再把原来的删掉，之后在重命名即可。</p><ol><li><p>可以看到现在磁盘还是厚置备。<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912004303810.png" alt="image-20260912004303810"></p></li><li><p>通过ssh进入后台的vmdk所在目录：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /vmfs/volumes/6a9fd-xxxxx-4f04/ubuntu22.04/</span><br></pre></td></tr></table></figure></li><li><p>执行vmkfstools指令：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vmkfstools -i ubuntu22.04.vmdk -d thin ubuntu22.04_thin.vmdk</span><br></pre></td></tr></table></figure><blockquote><p>-i ubuntu22.04.vmdk 是原磁盘文件</p><p>-d thin ubuntu22.04_thin.vmdk 是新生成的磁盘文件</p><p>thin表示生成一个精简置备的跳转硬盘，其他指令如下：<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912002717732.png" alt="image-20260912002717732"></p></blockquote></li><li><p>在web端数据存储浏览里头可以看到，精简置备的硬盘只有28G（实际数据大小）<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912002832576.png" alt="image-20260912002832576"></p></li><li><p>删除原来的500Gvmdk文件，刷新之后会出来一个-flat.vmdk文件，需要一并删除<br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003133842.png" alt="image-20260912003133842"><br><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003201905.png" alt="image-20260912003201905"></p><blockquote><p>.vmdk文件只是链接文件，是快捷方式，-flat.vmdk才是真正储存数据的地方</p></blockquote></li><li><p>在ssh里头使用mv命令把新文件重命名成原来的</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv ubuntu22.04_thin.vmdk ubuntu22.04.vmdk</span><br></pre></td></tr></table></figure><blockquote><ol><li>重命名只是重命名vmdk，-flat.vmdk的数据文件还是原来的</li><li>ubuntu22.04.vmdk作为链接文件里头已经写明指向ubuntu22.04_thin-flat.vmdk了，所以ubuntu22.04_thin-flat.vmdk这个文件<strong>不能重命名</strong>！</li></ol><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912003911354.png" alt="image-20260912003911354"></p></blockquote></li><li><p>重启esxi，就可以看到磁盘变成精简置备了</p><p><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/image-20260912005011837.png" alt="image-20260912005011837"></p></li></ol>]]></content>
+    
+    
+    <summary type="html">实验室新到了一台esxi服务器，但是供货商安装的系统磁盘用的厚置备，现在需要转换一下省点空间方便备份</summary>
+    
+    
+    
+    <category term="技术" scheme="https://www.happyshark.cn/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="技术" scheme="https://www.happyshark.cn/tags/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="网络" scheme="https://www.happyshark.cn/tags/%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
   
   <entry>
     <title>实验室内网部署本地overleaf-CEP</title>
@@ -450,27 +473,6 @@
     
     
     <category term="安全规约" scheme="https://www.happyshark.cn/tags/%E5%AE%89%E5%85%A8%E8%A7%84%E7%BA%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>抓饭</title>
-    <link href="https://www.happyshark.cn/2022/02/12/%E6%8A%93%E9%A5%AD/"/>
-    <id>https://www.happyshark.cn/2022/02/12/%E6%8A%93%E9%A5%AD/</id>
-    <published>2022-02-12T04:00:00.000Z</published>
-    <updated>2022-02-12T04:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<hr><ol><li><p>羊肉切开洗净，把水晾干，油锅加盐（不崩），中火把肉放进去抄抄，炒出水之后盖上锅盖把水闷干。</p><blockquote><p>过几分钟就开盖翻炒一下。 </p></blockquote><p><img src="https://blogimages.happyshark.cn/food/image-20220212132430021.png" alt="image-20220212132430021"></p></li><li><p>闷干之后出锅备用，油留锅里别倒掉<br><img src="https://blogimages.happyshark.cn/food/image-20220212132517077.png" alt="image-20220212132517077"></p></li><li><p>胡萝卜（3个）削皮切条，把米洗净备用<br><img src="https://blogimages.happyshark.cn/food/image-20220212132540721.png" alt="image-20220212132540721"></p></li><li><p>胡萝卜倒进锅里中火炒炒（油少了可以加些油），加些盐<br><img src="https://blogimages.happyshark.cn/food/image-20220212132605423.png" alt="image-20220212132605423"></p></li><li><p>抄完倒进高压锅，再往锅里加些水，米撒到胡萝卜上面，肉放到米上面。盖上锅盖大火烧到高压锅喷气，火改小一些（改到泄压阀不那么暴力为止）压10~15分钟米熟为止<br><img src="https://blogimages.happyshark.cn/food/image-20220212132627827.png" alt="image-20220212132627827"><br><img src="https://blogimages.happyshark.cn/food/image-20220212132651559.png" alt="image-20220212132651559"></p></li><li><p>关火高压锅放一边泄气，气没了就可以开锅享受美食啦</p></li></ol>]]></content>
-    
-    
-    <summary type="html">老爸的做法，高压锅版</summary>
-    
-    
-    
-    <category term="厨房里的秘密" scheme="https://www.happyshark.cn/categories/%E5%8E%A8%E6%88%BF%E9%87%8C%E7%9A%84%E7%A7%98%E5%AF%86/"/>
-    
-    
-    <category term="家的味道" scheme="https://www.happyshark.cn/tags/%E5%AE%B6%E7%9A%84%E5%91%B3%E9%81%93/"/>
     
   </entry>
   
