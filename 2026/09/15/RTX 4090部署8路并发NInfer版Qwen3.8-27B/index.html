@@ -1,0 +1,905 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>RTX 4090部署8路并发NInfer版Qwen3.8-27B | Happy Shark</title><meta name="author" content="HPShark"><meta name="copyright" content="HPShark"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="记录 RTX 4090 48GB 使用 Docker 部署 Qwen3.8-27B 的完整配置，包含 256K 上下文、MTP3、国内下载源、Cherry Studio 2.0.14 接入及实测速度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RTX 4090部署8路并发NInfer版Qwen3.8-27B">
+<meta property="og:url" content="https://www.happyshark.cn/2026/09/15/RTX%204090%E9%83%A8%E7%BD%B28%E8%B7%AF%E5%B9%B6%E5%8F%91NInfer%E7%89%88Qwen3.8-27B/index.html">
+<meta property="og:site_name" content="Happy Shark">
+<meta property="og:description" content="记录 RTX 4090 48GB 使用 Docker 部署 Qwen3.8-27B 的完整配置，包含 256K 上下文、MTP3、国内下载源、Cherry Studio 2.0.14 接入及实测速度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blogimages.happyshark.cn/RTX%204090%20%E9%83%A8%E7%BD%B2%20NInfer%E7%89%88Qwen3.8-27B%20256K/20260915170455115.png">
+<meta property="article:published_time" content="2026-09-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-14T16:00:00.000Z">
+<meta property="article:author" content="HPShark">
+<meta property="article:tag" content="技术">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blogimages.happyshark.cn/RTX%204090%20%E9%83%A8%E7%BD%B2%20NInfer%E7%89%88Qwen3.8-27B%20256K/20260915170455115.png"><link rel="shortcut icon" href="https://blogimages.happyshark.cn/hexo/favicon.ico"><link rel="canonical" href="https://www.happyshark.cn/2026/09/15/RTX%204090%E9%83%A8%E7%BD%B28%E8%B7%AF%E5%B9%B6%E5%8F%91NInfer%E7%89%88Qwen3.8-27B/index.html"><link rel="preconnect" href="//cdnjs.cloudflare.com"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="9vVi06K024u7LLF-6lX2_RXCGcQqtDxtcmacxWGeZhM"/><meta name="baidu-site-verification" content="SoQqqYx4asw1Hjo3"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5fb1b716f40cab42e95bf5d2d279dd42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-116830180-1"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-116830180-1');
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"这篇文章发布于","messageNext":"天之前，文章中的部分内容可能会过期。"},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdnjs.cloudflare.com/ajax/libs/egjs-infinitegrid/4.10.1/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RTX 4090部署8路并发NInfer版Qwen3.8-27B',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-09-15 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Happy Shark" type="application/atom+xml">
+</head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="https://www.unpkg.com/pace-js@latest/pace-theme-default.min.css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">43</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blogimages.happyshark.cn/RTX%204090%20%E9%83%A8%E7%BD%B2%20NInfer%E7%89%88Qwen3.8-27B%20256K/20260915170455115.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Happy Shark"><span class="site-name">Happy Shark</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-list"></i><span> 生活清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RTX 4090部署8路并发NInfer版Qwen3.8-27B</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-09-14T16:00:00.000Z" title="发表于 2026-09-15 00:00:00">2026-09-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-14T16:00:00.000Z" title="更新于 2026-09-15 00:00:00">2026-09-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>19分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RTX 4090部署8路并发NInfer版Qwen3.8-27B"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="环境与部署目标"><a href="#环境与部署目标" class="headerlink" title="环境与部署目标"></a>环境与部署目标</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>本文环境</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>宿主系统</td>
+<td>Ubuntu 22.04 LTS</td>
+</tr>
+<tr>
+<td>显卡</td>
+<td>RTX 4090，驱动报告显存 49,140 MiB，约 48GB</td>
+</tr>
+<tr>
+<td>系统内存</td>
+<td>约 32GB</td>
+</tr>
+<tr>
+<td>NVIDIA 驱动</td>
+<td>610.57.04</td>
+</tr>
+<tr>
+<td>Docker Engine</td>
+<td>29.8.0</td>
+</tr>
+<tr>
+<td>容器基础环境</td>
+<td>Ubuntu 24.04、CUDA 13.1.2</td>
+</tr>
+<tr>
+<td>引擎</td>
+<td><code>alanthinker/ninfer-4090-yarn</code>，面向 <code>sm_89</code></td>
+</tr>
+<tr>
+<td>模型</td>
+<td>Qwen3.8-27B，groupwise-int 格式的 <code>.ninfer</code> 权重</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>Cherry Studio 2.0.14</td>
+</tr>
+<tr>
+<td>工作目录</td>
+<td><code>/root/llm</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p><strong>本文使用的是 48GB 显存的 4090。 常见的 24GB 4090 可以参考引擎仓库的单路部署示例，但不能把本文的 8 路并发、状态缓存和显存实测数字直接套用过去</strong>。</p>
+<p>这里的 256K 指 <strong>262,144 token</strong>，是每个会话的上下文上限。输入、历史消息、工具定义以及生成内容都要在这个窗口内安排。虽然仓库名称带有 YaRN，本文没有启用位置缩放，保持原生 256K 配置。</p>
+</blockquote>
+<h2 id="先确认-Docker-能访问显卡"><a href="#先确认-Docker-能访问显卡" class="headerlink" title="先确认 Docker 能访问显卡"></a>先确认 Docker 能访问显卡</h2><p>本文从宿主机已经安装 NVIDIA 驱动、Docker Engine 和 NVIDIA Container Toolkit 开始。尚未安装时，可按 <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Docker 的 Ubuntu 安装文档</a>和 <a target="_blank" rel="noopener" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html">NVIDIA Container Toolkit 安装文档</a>准备环境。</p>
+<p>先在宿主机检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nvidia-smi</span><br><span class="line">docker version</span><br></pre></td></tr></table></figure>
+<p>再检查容器是否能访问 GPU：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm --gpus all \</span><br><span class="line">  docker.m.daocloud.io/nvidia/cuda:13.1.2-runtime-ubuntu24.04 \</span><br><span class="line">  nvidia-smi</span><br></pre></td></tr></table></figure>
+<p>能看到显卡信息后，再继续构建推理镜像。编译工具链放在 Docker 构建阶段，宿主机不需要另外安装同一版本的 CUDA Toolkit。</p>
+<h2 id="准备目录与源码"><a href="#准备目录与源码" class="headerlink" title="准备目录与源码"></a>准备目录与源码</h2><p>下面的命令按 root 用户编写。服务器地址以本文的 <code>192.168.6.53</code> 为例，部署到其他机器时，应改为那台机器实际拥有的内网地址。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /root/llm/models /root/llm/.cache/huggingface</span><br><span class="line"><span class="built_in">cd</span> /root/llm</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/alanthinker/ninfer-4090-yarn.git</span><br><span class="line"><span class="built_in">cd</span> ninfer-4090-yarn</span><br><span class="line">git checkout 53c871ae79dd2e34ff24ab787545013235bc6e78</span><br></pre></td></tr></table></figure>
+<p>这里固定了本文使用的源码版本。后面的国内源配置和下载脚本需要按本文补充，避免直接使用仓库后续更新后的默认行为。</p>
+<p>GitHub 访问需要代理时，可以只给这次命令设置代理，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https_proxy=http://YOUR_PROXY_HOST:10808 \</span><br><span class="line">http_proxy=http://YOUR_PROXY_HOST:10808 \</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/alanthinker/ninfer-4090-yarn.git</span><br></pre></td></tr></table></figure>
+<p>这是上一条 <code>git clone</code> 的替代写法，不需要重复克隆。<code>YOUR_PROXY_HOST</code> 要替换成自己的代理地址；代理协议应与代理软件提供的端口类型一致。</p>
+<h2 id="配置镜像构建与国内源"><a href="#配置镜像构建与国内源" class="headerlink" title="配置镜像构建与国内源"></a>配置镜像构建与国内源</h2><p>本机采用以下下载源：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CUDA 基础镜像</td>
+<td><code>docker.m.daocloud.io/nvidia/cuda</code></td>
+</tr>
+<tr>
+<td>容器 Ubuntu 软件包</td>
+<td><code>mirrors.tuna.tsinghua.edu.cn</code></td>
+</tr>
+<tr>
+<td>pip、uv 软件包</td>
+<td><code>pypi.tuna.tsinghua.edu.cn</code></td>
+</tr>
+<tr>
+<td>模型文件</td>
+<td><code>hf-mirror.com</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>镜像站的可用性可能变化。这里把地址放在脚本和构建参数中，方便替换，不需要给宿主机设置永久代理。</p>
+<h3 id="1-容器软件源脚本"><a href="#1-容器软件源脚本" class="headerlink" title="1. 容器软件源脚本"></a>1. 容器软件源脚本</h3><p>在 <code>/root/llm/ninfer-4090-yarn/scripts/configure-cn-sources.sh</code> 写入：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">set</span> -eu</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> <span class="built_in">source</span> <span class="keyword">in</span> /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; <span class="keyword">do</span></span><br><span class="line">  [ -f <span class="string">&quot;<span class="variable">$source</span>&quot;</span> ] || <span class="built_in">continue</span></span><br><span class="line">  sed -i \</span><br><span class="line">    -e <span class="string">&#x27;s|https\?://\([a-z][a-z]\.\)\?archive.ubuntu.com/ubuntu|https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g&#x27;</span> \</span><br><span class="line">    -e <span class="string">&#x27;s|https\?://security.ubuntu.com/ubuntu|https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g&#x27;</span> \</span><br><span class="line">    <span class="string">&quot;<span class="variable">$source</span>&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-Dockerfile"><a href="#2-Dockerfile" class="headerlink" title="2. Dockerfile"></a>2. Dockerfile</h3><p>将 <code>/root/llm/ninfer-4090-yarn/Dockerfile</code> 替换为下面的内容。这是本文实际构建使用的文件：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ARG</span> CUDA_REGISTRY=docker.m.daocloud.io</span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> $&#123;CUDA_REGISTRY&#125;/nvidia/cuda:<span class="number">13.1</span>.<span class="number">2</span>-devel-ubuntu24.<span class="number">04</span> AS build</span><br><span class="line"></span><br><span class="line"><span class="keyword">ARG</span> DEBIAN_FRONTEND=noninteractive</span><br><span class="line"><span class="keyword">ENV</span> HF_ENDPOINT=https://hf-mirror.com \</span><br><span class="line">    PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \</span><br><span class="line">    UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> scripts/configure-cn-sources.sh /tmp/configure-cn-sources.sh</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> sh /tmp/configure-cn-sources.sh &amp;&amp; rm /tmp/configure-cn-sources.sh</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">        cmake \</span></span><br><span class="line"><span class="bash">        libavcodec-dev \</span></span><br><span class="line"><span class="bash">        libavformat-dev \</span></span><br><span class="line"><span class="bash">        libavutil-dev \</span></span><br><span class="line"><span class="bash">        libcurl4-openssl-dev \</span></span><br><span class="line"><span class="bash">        libswscale-dev \</span></span><br><span class="line"><span class="bash">        ninja-build \</span></span><br><span class="line"><span class="bash">        pkg-config \</span></span><br><span class="line"><span class="bash">    &amp;&amp; rm -rf /var/lib/apt/lists/*</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /src</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> cmake -S . -B /build -G Ninja \</span></span><br><span class="line"><span class="bash">        -DCMAKE_BUILD_TYPE=Release \</span></span><br><span class="line"><span class="bash">        -DNINFER_BUILD_APPS=ON \</span></span><br><span class="line"><span class="bash">        -DBUILD_TESTING=OFF \</span></span><br><span class="line"><span class="bash">        -DNINFER_BUILD_BENCHMARKS=OFF \</span></span><br><span class="line"><span class="bash">    &amp;&amp; cmake --build /build --parallel --target ninfer ninfer-serve</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> $&#123;CUDA_REGISTRY&#125;/nvidia/cuda:<span class="number">13.1</span>.<span class="number">2</span>-runtime-ubuntu24.<span class="number">04</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ARG</span> DEBIAN_FRONTEND=noninteractive</span><br><span class="line"><span class="keyword">ENV</span> HF_ENDPOINT=https://hf-mirror.com \</span><br><span class="line">    HF_HOME=/workspace/.cache/huggingface \</span><br><span class="line">    PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \</span><br><span class="line">    UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> scripts/configure-cn-sources.sh /tmp/configure-cn-sources.sh</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> sh /tmp/configure-cn-sources.sh &amp;&amp; rm /tmp/configure-cn-sources.sh</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">        ca-certificates \</span></span><br><span class="line"><span class="bash">        libavcodec60 \</span></span><br><span class="line"><span class="bash">        libavformat60 \</span></span><br><span class="line"><span class="bash">        libavutil58 \</span></span><br><span class="line"><span class="bash">        libcurl4t64 \</span></span><br><span class="line"><span class="bash">        libswscale7 \</span></span><br><span class="line"><span class="bash">    &amp;&amp; rm -rf /var/lib/apt/lists/*</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The CUDA runtime image ships forward-compatibility libraries in</span></span><br><span class="line"><span class="comment"># /usr/local/cuda*/compat (a newer libcuda.so than the host driver). Forward</span></span><br><span class="line"><span class="comment"># compatibility is supported only on datacenter GPUs; on any GeForce card the</span></span><br><span class="line"><span class="comment"># loader picks these up and every CUDA call fails at startup with</span></span><br><span class="line"><span class="comment">#   cudaErrorCompatNotSupportedOnDevice: forward compatibility was attempted</span></span><br><span class="line"><span class="comment">#   on non supported HW</span></span><br><span class="line"><span class="comment"># Removing them lets the container use the host driver through ordinary CUDA</span></span><br><span class="line"><span class="comment"># minor-version compatibility, which is what an RTX 3090/3090 Ti needs.</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> rm -rf /usr/<span class="built_in">local</span>/cuda-13.1/compat /usr/<span class="built_in">local</span>/cuda-13/compat /usr/<span class="built_in">local</span>/cuda/compat</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=build /build/apps/ninfer /usr/<span class="built_in">local</span>/bin/ninfer</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=build /build/apps/ninfer-serve /usr/<span class="built_in">local</span>/bin/ninfer-serve</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /workspace</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">STOPSIGNAL</span> SIGTERM</span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;ninfer-serve&quot;</span>, <span class="string">&quot;--help&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+<p>这个 Dockerfile 分为编译和运行两个阶段。最终镜像只保留可执行程序及运行依赖；移除 CUDA forward-compatibility 库的步骤也予以保留，让容器使用宿主机驱动。</p>
+<h3 id="3-构建脚本"><a href="#3-构建脚本" class="headerlink" title="3. 构建脚本"></a>3. 构建脚本</h3><p>在 <code>/root/llm/build-ninfer.sh</code> 写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -euo pipefail</span><br><span class="line">project_dir=<span class="string">&quot;<span class="subst">$(cd -- <span class="string">&quot;<span class="subst">$(dirname -- <span class="string">&quot;<span class="variable">$&#123;BASH_SOURCE[0]&#125;</span>&quot;</span>)</span>&quot;</span> &amp;&amp; pwd)</span>&quot;</span></span><br><span class="line"><span class="built_in">exec</span> docker build \</span><br><span class="line">  --build-arg <span class="string">&quot;CUDA_REGISTRY=<span class="variable">$&#123;CUDA_REGISTRY:-docker.m.daocloud.io&#125;</span>&quot;</span> \</span><br><span class="line">  --tag <span class="string">&quot;<span class="variable">$&#123;NINFER_IMAGE:-ninfer-4090:sm89&#125;</span>&quot;</span> \</span><br><span class="line">  <span class="string">&quot;<span class="variable">$project_dir</span>/ninfer-4090-yarn&quot;</span></span><br></pre></td></tr></table></figure>
+<p>然后构建：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/llm</span><br><span class="line">chmod +x build-ninfer.sh</span><br><span class="line">./build-ninfer.sh</span><br></pre></td></tr></table></figure>
+<p><code>ninfer-4090:sm89</code> 是本地构建生成的镜像标签。首次构建需要下载基础镜像、安装依赖并编译 CUDA 代码，耗时会受到网络、CPU 和磁盘速度影响。</p>
+<p>如果默认镜像站不可用，可以改用其他可用的站点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CUDA_REGISTRY=docker.1ms.run ./build-ninfer.sh</span><br></pre></td></tr></table></figure>
+<h2 id="下载与引擎匹配的模型"><a href="#下载与引擎匹配的模型" class="headerlink" title="下载与引擎匹配的模型"></a>下载与引擎匹配的模型</h2><p>本文使用的模型仓库是 <a target="_blank" rel="noopener" href="https://huggingface.co/neroued/Qwen3.8-27B-NInfer">neroued/Qwen3.8-27B-NInfer</a>，文件名为 <code>qwen3_8_27b.ninfer</code>，约 16.96 GiB。</p>
+<p>这里需要固定模型版本：<strong>该引擎不能读取模型仓库新版 <code>main</code> 中增加的 DFlash2 对象。</strong> 文件名相同，并不代表内部格式仍与旧引擎兼容。</p>
+<p>将 <code>/root/llm/ninfer-4090-yarn/scripts/download-qwen38.sh</code> 写为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -euo pipefail</span><br><span class="line"></span><br><span class="line"><span class="comment"># Model downloads must connect directly, even if the caller exported a proxy.</span></span><br><span class="line"><span class="built_in">unset</span> http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY</span><br><span class="line"></span><br><span class="line">root=<span class="string">&quot;<span class="subst">$(cd -- <span class="string">&quot;<span class="subst">$(dirname -- <span class="string">&quot;<span class="variable">$&#123;BASH_SOURCE[0]&#125;</span>&quot;</span>)</span>/..&quot;</span> &amp;&amp; pwd)</span>&quot;</span></span><br><span class="line">model_dir=<span class="string">&quot;<span class="variable">$&#123;NINFER_MODEL_DIR:-<span class="variable">$root</span>/models&#125;</span>&quot;</span></span><br><span class="line">model=<span class="string">&quot;<span class="variable">$model_dir</span>/qwen3_8_27b.ninfer&quot;</span></span><br><span class="line">endpoint=<span class="string">&quot;<span class="variable">$&#123;HF_ENDPOINT:-https://hf-mirror.com&#125;</span>&quot;</span></span><br><span class="line"><span class="comment"># This engine predates DFlash2. Newer main artifacts contain unsupported objects.</span></span><br><span class="line">expected_sha256=eec39564993d6e9c7d5e383382a760f093465c9d163ec9a1bd6b80199514bf3e</span><br><span class="line">revision=18dfc887423fa5aabf3cb56fac41490e462b3fab</span><br><span class="line"></span><br><span class="line">mkdir -p -- <span class="string">&quot;<span class="variable">$model_dir</span>&quot;</span></span><br><span class="line"><span class="keyword">if</span> [[ -f <span class="string">&quot;<span class="variable">$model</span>&quot;</span> ]] &amp;&amp; <span class="built_in">printf</span> <span class="string">&#x27;%s  %s\n&#x27;</span> <span class="string">&quot;<span class="variable">$expected_sha256</span>&quot;</span> <span class="string">&quot;<span class="variable">$model</span>&quot;</span> | sha256sum --check --status; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">printf</span> <span class="string">&#x27;Model already verified: %s\n&#x27;</span> <span class="string">&quot;<span class="variable">$model</span>&quot;</span></span><br><span class="line">  <span class="built_in">exit</span> 0</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;%s\n&#x27;</span> <span class="string">&#x27;Downloading Qwen3.8-27B NInfer model...&#x27;</span></span><br><span class="line">url=<span class="string">&quot;<span class="variable">$&#123;endpoint%/&#125;</span>/neroued/Qwen3.8-27B-NInfer/resolve/<span class="variable">$revision</span>/qwen3_8_27b.ninfer&quot;</span></span><br><span class="line"><span class="function"><span class="title">download</span></span>() &#123;</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">command</span> -v aria2c &gt;/dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">    aria2c --no-conf=<span class="literal">true</span> --<span class="built_in">continue</span>=<span class="literal">true</span> --auto-file-renaming=<span class="literal">false</span> --file-allocation=none \</span><br><span class="line">      --max-connection-per-server=8 --split=8 --min-split-size=64M \</span><br><span class="line">      --max-tries=5 --retry-wait=5 --connect-timeout=20 \</span><br><span class="line">      --summary-interval=30 --console-log-level=warn \</span><br><span class="line">      --dir=<span class="string">&quot;<span class="variable">$model_dir</span>&quot;</span> --out=qwen3_8_27b.ninfer.part <span class="string">&quot;<span class="variable">$url</span>&quot;</span></span><br><span class="line">  <span class="keyword">elif</span> [[ -f <span class="string">&quot;<span class="variable">$model</span>.part.aria2&quot;</span> ]]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">printf</span> <span class="string">&#x27;%s\n&#x27;</span> <span class="string">&#x27;Install aria2 to resume this multipart download.&#x27;</span> &gt;&amp;2</span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    curl --<span class="built_in">disable</span> --noproxy <span class="string">&#x27;*&#x27;</span> -L -C - --fail --retry 5 --connect-timeout 20 --output <span class="string">&quot;<span class="variable">$model</span>.part&quot;</span> <span class="string">&quot;<span class="variable">$url</span>&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ! download; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">printf</span> <span class="string">&#x27;%s\n&#x27;</span> <span class="string">&#x27;Download failed. Run this script again to resume.&#x27;</span> &gt;&amp;2</span><br><span class="line">  <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;%s  %s\n&#x27;</span> <span class="string">&quot;<span class="variable">$expected_sha256</span>&quot;</span> <span class="string">&quot;<span class="variable">$model</span>.part&quot;</span> | sha256sum --check</span><br><span class="line">mv -- <span class="string">&quot;<span class="variable">$model</span>.part&quot;</span> <span class="string">&quot;<span class="variable">$model</span>&quot;</span></span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;Model ready: %s\n&#x27;</span> <span class="string">&quot;<span class="variable">$model</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>执行下载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/llm</span><br><span class="line">NINFER_MODEL_DIR=/root/llm/models \</span><br><span class="line">  bash ninfer-4090-yarn/scripts/download-qwen38.sh</span><br></pre></td></tr></table></figure>
+<p>脚本固定模型修订版本，并在下载结束后校验 SHA-256。校验通过才会把 <code>.part</code> 文件改为正式模型文件名。下载中断后重新执行即可续传；如果此前使用 aria2 下载，需要继续使用 aria2 完成。</p>
+<p>模型下载显式绕过代理，默认直接连接 HF 镜像，避免大文件占用代理流量。已有模型也会先做校验，通过后跳过下载。</p>
+<h2 id="启动推理服务"><a href="#启动推理服务" class="headerlink" title="启动推理服务"></a>启动推理服务</h2><p>在 <code>/root/llm/mirrors.env</code> 写入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HF_ENDPOINT=https://hf-mirror.com</span><br><span class="line">HF_HOME=/workspace/.cache/huggingface</span><br><span class="line">PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure>
+<p>在 <code>/root/llm/run-ninfer.sh</code> 写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -euo pipefail</span><br><span class="line"></span><br><span class="line">project_dir=<span class="string">&quot;<span class="subst">$(cd -- <span class="string">&quot;<span class="subst">$(dirname -- <span class="string">&quot;<span class="variable">$&#123;BASH_SOURCE[0]&#125;</span>&quot;</span>)</span>&quot;</span> &amp;&amp; pwd)</span>&quot;</span></span><br><span class="line">image=<span class="string">&quot;<span class="variable">$&#123;NINFER_IMAGE:-ninfer-4090:sm89&#125;</span>&quot;</span></span><br><span class="line">model_dir=<span class="string">&quot;<span class="variable">$&#123;MODEL_DIR:-<span class="variable">$project_dir</span>/models&#125;</span>&quot;</span></span><br><span class="line">cache_dir=<span class="string">&quot;<span class="variable">$&#123;HF_CACHE_DIR:-<span class="variable">$project_dir</span>/.cache/huggingface&#125;</span>&quot;</span></span><br><span class="line">run_options=()</span><br><span class="line"><span class="keyword">if</span> [[ <span class="variable">$#</span> -eq 1 &amp;&amp; <span class="string">&quot;<span class="variable">$1</span>&quot;</span> == --detach ]]; <span class="keyword">then</span></span><br><span class="line">  run_options+=(--detach)</span><br><span class="line"><span class="keyword">elif</span> [[ <span class="variable">$#</span> -ne 0 ]]; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;用法：<span class="variable">$0</span> [--detach]&quot;</span> &gt;&amp;2</span><br><span class="line">  <span class="built_in">exit</span> 2</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [[ ! -f <span class="string">&quot;<span class="variable">$model_dir</span>/qwen3_8_27b.ninfer&quot;</span> ]]; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;缺少模型：<span class="variable">$model_dir</span>/qwen3_8_27b.ninfer，请先放入模型文件。&quot;</span> &gt;&amp;2</span><br><span class="line">  <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ! docker image inspect <span class="string">&quot;<span class="variable">$image</span>&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">  NINFER_IMAGE=<span class="string">&quot;<span class="variable">$image</span>&quot;</span> <span class="string">&quot;<span class="variable">$project_dir</span>/build-ninfer.sh&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">mkdir -p <span class="string">&quot;<span class="variable">$cache_dir</span>&quot;</span></span><br><span class="line"><span class="built_in">exec</span> docker run <span class="string">&quot;<span class="variable">$&#123;run_options[@]&#125;</span>&quot;</span> --name ninfer-4090 \</span><br><span class="line">  --rm --gpus all --publish 192.168.6.53:8080:8080 \</span><br><span class="line">  --env-file <span class="string">&quot;<span class="variable">$project_dir</span>/mirrors.env&quot;</span> \</span><br><span class="line">  --workdir /workspace \</span><br><span class="line">  --volume <span class="string">&quot;<span class="variable">$model_dir</span>:/workspace/models:ro&quot;</span> \</span><br><span class="line">  --volume <span class="string">&quot;<span class="variable">$cache_dir</span>:/workspace/.cache/huggingface&quot;</span> \</span><br><span class="line">  <span class="string">&quot;<span class="variable">$image</span>&quot;</span> \</span><br><span class="line">  ninfer-serve models/qwen3_8_27b.ninfer \</span><br><span class="line">  --host 0.0.0.0 --port 8080 \</span><br><span class="line">  --max-context 262144 --kv-capacity auto \</span><br><span class="line">  --max-concurrency 8 --max-pending-requests 16 \</span><br><span class="line">  --device-state-slots 16 --host-state-slots 32 \</span><br><span class="line">  --pending-timeout-ms 600000 \</span><br><span class="line">  --prefill-chunk 1024 --kv-dtype rk4v4-e8 \</span><br><span class="line">  --spec mtp --draft-tokens 3 --lm-head-draft \</span><br><span class="line">  --vision --preserve-thinking</span><br></pre></td></tr></table></figure>
+<p>后台启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/llm</span><br><span class="line">chmod +x run-ninfer.sh</span><br><span class="line">./run-ninfer.sh --detach</span><br></pre></td></tr></table></figure>
+<p>然后观察日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker logs -f ninfer-4090</span><br></pre></td></tr></table></figure>
+<p>看到 <code>engine ready</code> 和 <code>listening on http://0.0.0.0:8080</code> 后，服务才完成初始化。本机一次启动约花费 44 秒，仅供判断启动过程参考。</p>
+<p>容器内部的 <code>0.0.0.0:8080</code> 用于接收 Docker 转发；实际发布到宿主机的地址是 <code>192.168.6.53:8080</code>。本文没有启用 API Key 鉴权，服务面向可信局域网使用。</p>
+<h3 id="关键参数如何理解"><a href="#关键参数如何理解" class="headerlink" title="关键参数如何理解"></a>关键参数如何理解</h3><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>本文取值</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--max-context</code></td>
+<td><code>262144</code></td>
+<td>每个会话的上下文上限</td>
+</tr>
+<tr>
+<td><code>--kv-capacity</code></td>
+<td><code>auto</code></td>
+<td>根据可用显存建立共享 KV 池，并预留约 1 GiB 安全余量</td>
+</tr>
+<tr>
+<td><code>--max-concurrency</code></td>
+<td><code>8</code></td>
+<td>最多同时执行的请求数</td>
+</tr>
+<tr>
+<td><code>--max-pending-requests</code></td>
+<td><code>16</code></td>
+<td>等待队列容量</td>
+</tr>
+<tr>
+<td><code>--pending-timeout-ms</code></td>
+<td><code>600000</code></td>
+<td>队列等待超时为 10 分钟</td>
+</tr>
+<tr>
+<td><code>--device-state-slots</code></td>
+<td><code>16</code></td>
+<td>活跃请求之外的显卡状态、检查点容量</td>
+</tr>
+<tr>
+<td><code>--host-state-slots</code></td>
+<td><code>32</code></td>
+<td>主机内存中的状态槽容量</td>
+</tr>
+<tr>
+<td><code>--prefill-chunk</code></td>
+<td><code>1024</code></td>
+<td>输入预填充的分块大小</td>
+</tr>
+<tr>
+<td><code>--kv-dtype</code></td>
+<td><code>rk4v4-e8</code></td>
+<td>E8 四位 KV 存储模式</td>
+</tr>
+<tr>
+<td><code>--spec mtp --draft-tokens 3</code></td>
+<td>MTP3</td>
+<td>每轮最多提出 3 个草稿 token，验证后接受</td>
+</tr>
+<tr>
+<td><code>--lm-head-draft</code></td>
+<td>开启</td>
+<td>使用优化后的草稿输出头</td>
+</tr>
+<tr>
+<td><code>--vision</code></td>
+<td>开启</td>
+<td>加载视觉能力</td>
+</tr>
+<tr>
+<td><code>--preserve-thinking</code></td>
+<td>开启</td>
+<td>在后续轮次保留已结束回复的思考内容</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>CUDA Graph 默认开启。<code>--preserve-thinking</code> 控制历史思考内容的保留，不等于强制每次请求开启思考。</p>
+<h3 id="256K-与-8-路并发的关系"><a href="#256K-与-8-路并发的关系" class="headerlink" title="256K 与 8 路并发的关系"></a>256K 与 8 路并发的关系</h3><p>本机启动日志给出的共享 KV 池为 <strong>1,418,496 token</strong>。活跃请求和保留的前缀缓存共同使用这部分空间。</p>
+<p>因此，单个会话的上限是 262,144，但 8 个会话不能同时各占满 262,144：后者合计需要 2,097,152 token，超过当前池容量。把池容量直接除以 8，只能得到约 177,312 token 的算术均值，并不代表引擎把每路固定限制在这个长度。</p>
+<p>只有一个会话活跃时，8 路并发上限不会把它的窗口降为八分之一。如果业务要求多个会话同时跑满 256K，应另外按共享缓存容量规划并发，并实测长上下文负载。</p>
+<h2 id="验证接口"><a href="#验证接口" class="headerlink" title="验证接口"></a>验证接口</h2><p>先检查健康状态：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --noproxy <span class="string">&#x27;*&#x27;</span> http://192.168.6.53:8080/health</span><br></pre></td></tr></table></figure>
+<p>正常返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;status&quot;</span>:<span class="string">&quot;ok&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>再获取模型信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --noproxy <span class="string">&#x27;*&#x27;</span> http://192.168.6.53:8080/v1/models</span><br></pre></td></tr></table></figure>
+<p>关键字段应为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;qwen3.8-27b&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;context_window&quot;</span>: <span class="number">262144</span>,</span><br><span class="line">  <span class="attr">&quot;max_model_len&quot;</span>: <span class="number">262144</span>,</span><br><span class="line">  <span class="attr">&quot;modalities&quot;</span>: &#123;<span class="attr">&quot;vision&quot;</span>: <span class="literal">true</span>&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面只展示 <code>data</code> 数组中模型对象的部分字段。最后用 Chat Completions 发送一个短请求：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">curl --noproxy <span class="string">&#x27;*&#x27;</span> http://192.168.6.53:8080/v1/chat/completions \</span><br><span class="line">  -H <span class="string">&#x27;Content-Type: application/json&#x27;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">    &quot;model&quot;: &quot;qwen3.8-27b&quot;,</span></span><br><span class="line"><span class="string">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;请只回复：连接成功&quot;&#125;],</span></span><br><span class="line"><span class="string">    &quot;max_tokens&quot;: 64,</span></span><br><span class="line"><span class="string">    &quot;chat_template_kwargs&quot;: &#123;&quot;enable_thinking&quot;: false&#125;</span></span><br><span class="line"><span class="string">  &#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+<p><code>--noproxy &#39;*&#39;</code> 让这几次局域网检查直接访问服务器。如果能够返回正常的 <code>choices</code>，再接入客户端。</p>
+<h2 id="接入-Cherry-Studio-2-0-14"><a href="#接入-Cherry-Studio-2-0-14" class="headerlink" title="接入 Cherry Studio 2.0.14"></a>接入 Cherry Studio 2.0.14</h2><p>在“设置 → 模型服务”中添加 OpenAI 兼容服务，填写：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API 地址</td>
+<td><code>http://192.168.6.53:8080/v1</code></td>
+</tr>
+<tr>
+<td>API Key</td>
+<td>服务未开启鉴权；客户端必填时可填 <code>ninfer</code></td>
+</tr>
+<tr>
+<td>模型 ID</td>
+<td><code>qwen3.8-27b</code></td>
+</tr>
+<tr>
+<td>聊天接口</td>
+<td>OpenAI Chat Completions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>获取并添加模型后，检查该模型使用的聊天接口，选择 Chat Completions。这里的模型 ID 要与 <code>/v1/models</code> 返回的一致。</p>
+<h3 id="遇到-additional-response-fields-报错"><a href="#遇到-additional-response-fields-报错" class="headerlink" title="遇到 additional response fields 报错"></a>遇到 additional response fields 报错</h3><p>如果出现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">the requested additional response fields have no available response representation</span><br></pre></td></tr></table></figure>
+<p>对应的服务端错误是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;error&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;code&quot;</span>: <span class="string">&quot;include_not_supported&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;param&quot;</span>: <span class="string">&quot;include&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;invalid_request_error&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是 Responses 请求携带非空 <code>include</code> 时触发的参数校验。当前引擎的 Responses 接口只接受省略该字段或空数组。</p>
+<p>在 Cherry Studio 中将聊天接口改为 <strong>Chat Completions</strong> 即可避开这处不兼容。本机已复现该错误，并确认 Chat Completions 请求正常返回 HTTP 200。</p>
+<h3 id="为什么获取模型后显示-100-万上下文"><a href="#为什么获取模型后显示-100-万上下文" class="headerlink" title="为什么获取模型后显示 100 万上下文"></a>为什么获取模型后显示 100 万上下文</h3><p>Cherry Studio 2.0.14 的模型服务页面可能把 Qwen3.8-27B 标为 <strong>1,000,000 token</strong>，即使本地 <code>/v1/models</code> 已返回 262,144。</p>
+<p>核对该版本源码后，可以看到两步处理：</p>
+<ol>
+<li>OpenAI 兼容模型获取逻辑只把模型 ID、名称和归属方映射到客户端模型对象，没有读取本地服务的上下文长度字段。</li>
+<li>客户端随后用内置模型库补充配置；该版本的 Qwen3.8-27B 条目写的是 <code>contextWindow: 1000000</code>。</li>
+</ol>
+<p>所以，这个数字来自客户端的通用模型资料，不能用来判断本地部署实际开放的长度。给 NInfer 多返回几个同义字段，也不会自动解决 2.0.14 的这条读取链路。</p>
+<p>在已添加模型的编辑页面，手动覆盖“上下文窗口”为 <strong>262144</strong>。对于另外两个字段，可以按日常使用需要制定客户端预算，例如：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th style="text-align:right">一组日常使用的客户端预算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上下文窗口</td>
+<td style="text-align:right">262144</td>
+</tr>
+<tr>
+<td>最大输入 token</td>
+<td style="text-align:right">253952</td>
+</tr>
+<tr>
+<td>最大输出 token</td>
+<td style="text-align:right">8192</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>输入预算按 <code>262144 - 8192</code> 计算，为回复预留 8K。<strong>这组输入、输出数值是客户端使用策略，不是模型分别拥有的两个独立窗口，也不是服务端声明的硬性输出上限。</strong> 服务未指定请求输出长度时，默认输出预算恰好也是 8192；需要长回复时，可以调整客户端预算，但输入与输出仍共用 256K，模板和工具内容也要计入。</p>
+<p>模型页的“最大输出”是客户端能力配置，单轮实际输出还会受助手设置和请求参数影响。模型页填写 8192，并不等于每次都会生成 8192 token。</p>
+<p>如果要实现“获取模型时自动填好这三个字段”，需要在 Cherry Studio 客户端同时补上远端字段映射、远端部署限制的优先级，以及输入/输出限制的保存逻辑。本文保留现有客户端，采用手动覆盖，不修改推理服务。</p>
+<h2 id="实测速度与预期"><a href="#实测速度与预期" class="headerlink" title="实测速度与预期"></a>实测速度与预期</h2><p>本文单路短提示词测试使用固定的三组任务，每次输出上限为 768 token，关闭思考，温度 0.7、top-p 0.8、top-k 20、presence penalty 1.5、seed 42。三个任务都生成到 768 token，因此这里只比较生成速度，不把它们当作完整任务的质量评测。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th style="text-align:right">MTP3 解码速度</th>
+<th style="text-align:right">草稿接受率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中文科普长文</td>
+<td style="text-align:right">94.3 token/s</td>
+<td style="text-align:right">39.8%</td>
+</tr>
+<tr>
+<td>Python 代码</td>
+<td style="text-align:right">142.2 token/s</td>
+<td style="text-align:right">77.0%</td>
+</tr>
+<tr>
+<td>JSONL 数据</td>
+<td style="text-align:right">142.0 token/s</td>
+<td style="text-align:right">77.1%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>每项只测了一次。这组结果说明速度会随内容变化：草稿越容易被主模型接受，每轮能够提交的 token 往往越多。日常中文对话只有 100 多 token/s，并不能单凭这个数字判断部署有问题。</p>
+<p>也测试过把草稿长度从 3 提高到 5：中文降到 80.6 token/s，代码为 146.0 token/s，JSONL 为 139.8 token/s。增加草稿长度没有带来普遍收益，因此最终恢复 MTP3。</p>
+<p>另一次 8 路并发测试中，每路短提示词 57 token、输出 512 token、关闭思考，8 个请求均成功：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>统计口径</th>
+<th style="text-align:right">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>总输出</td>
+<td style="text-align:right">4096 token</td>
+</tr>
+<tr>
+<td>客户端总耗时，含输入处理和等待</td>
+<td style="text-align:right">14.701 秒</td>
+</tr>
+<tr>
+<td>按总耗时计算的聚合速度</td>
+<td style="text-align:right">278.62 token/s</td>
+</tr>
+<tr>
+<td>服务端一个完整 5 秒窗口的聚合解码速度</td>
+<td style="text-align:right">321.6 token/s</td>
+</tr>
+<tr>
+<td>每路请求的解码速度</td>
+<td style="text-align:right">约 38–41 token/s</td>
+</tr>
+<tr>
+<td>显存峰值</td>
+<td style="text-align:right">46,911 / 49,140 MiB</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>聚合速度描述整张卡同时服务多个请求的吞吐，不能当作一个聊天窗口的输出速度。以上也没有验证 8 路同时满 256K 或图片推理负载。</p>
+<p>当前运行的是 <strong>groupwise-int + MTP3</strong>。网上的 NVFP4Full + DFlash 成绩使用了不同的量化与推测解码路径，比较时还需要对齐显卡、模型、上下文长度和任务内容。</p>
+<h2 id="日常维护"><a href="#日常维护" class="headerlink" title="日常维护"></a>日常维护</h2><p>查看状态和日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker ps --filter name=ninfer-4090</span><br><span class="line">docker logs --tail 100 ninfer-4090</span><br></pre></td></tr></table></figure>
+<p>停止服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stop ninfer-4090</span><br></pre></td></tr></table></figure>
+<p>重新启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/llm</span><br><span class="line">./run-ninfer.sh --detach</span><br></pre></td></tr></table></figure>
+<p>启动脚本使用 <code>--rm</code>，容器停止后会被删除，因此重新启动要执行脚本，不能依赖 <code>docker start</code> 恢复旧容器。模型和 HF 缓存位于宿主机挂载目录中，不会随着容器删除；进程内的会话和前缀缓存需要重新建立。这份脚本也没有配置开机自启。</p>
+<p>如果再次运行脚本提示容器名称被占用，先用 <code>docker ps -a --filter name=ninfer-4090</code> 确认已有服务状态。镜像构建成功后，普通启停不需要重新编译，也不需要重新下载已校验的模型。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/alanthinker/ninfer-4090-yarn">NInfer-4090-YaRN 源码</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/alanthinker/ninfer-4090-yarn/tree/53c871ae79dd2e34ff24ab787545013235bc6e78">本文固定的引擎版本</a></li>
+<li><a target="_blank" rel="noopener" href="https://huggingface.co/neroued/Qwen3.8-27B-NInfer/tree/18dfc887423fa5aabf3cb56fac41490e462b3fab">Qwen3.8-27B-NInfer 模型的固定修订</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/CherryHQ/cherry-studio/blob/v2.0.14/src/main/ai/provider/listModels.ts#L789">Cherry Studio 2.0.14：模型获取逻辑</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/CherryHQ/cherry-studio/blob/v2.0.14/src/renderer/pages/settings/ProviderSettings/utils/modelSync.ts">Cherry Studio 2.0.14：模型资料合并与保存</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/CherryHQ/cherry-studio/blob/v2.0.14/packages/provider-registry/data/models.json">Cherry Studio 2.0.14：内置模型资料</a></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn">HPShark</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.happyshark.cn/2026/09/15/RTX%204090%E9%83%A8%E7%BD%B28%E8%B7%AF%E5%B9%B6%E5%8F%91NInfer%E7%89%88Qwen3.8-27B/">https://www.happyshark.cn/2026/09/15/RTX 4090部署8路并发NInfer版Qwen3.8-27B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.happyshark.cn" target="_blank">Happy Shark</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8A%80%E6%9C%AF/">技术</a><a class="post-meta__tags" href="/tags/%E7%BD%91%E7%BB%9C/">网络</a></div><div class="post_share"><div class="social-share" data-image="https://blogimages.happyshark.cn/RTX%204090%20%E9%83%A8%E7%BD%B2%20NInfer%E7%89%88Qwen3.8-27B%20256K/20260915170455115.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/" title="esxi硬盘精简置备、厚置备切换"><img class="cover" src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/20260912000146180.png" onerror="onerror=null;src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">esxi硬盘精简置备、厚置备切换</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/" title="esxi硬盘精简置备、厚置备切换"><img class="cover" src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/20260912000146180.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-11</div><div class="title">esxi硬盘精简置备、厚置备切换</div></div></a></div><div><a href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/" title="实验室内网部署本地overleaf-CEP"><img class="cover" src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260109233539.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-08</div><div class="title">实验室内网部署本地overleaf-CEP</div></div></a></div><div><a href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"><img class="cover" src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/20251106163319.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-06</div><div class="title">ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</div></div></a></div><div><a href="/2024/12/02/%E7%94%B2%E9%AA%A8%E6%96%87%E6%A2%AF%E5%AD%90%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/" title="甲骨文x-ui搭建过程笔记"><img class="cover" src="https://blogimages.happyshark.cn/%E7%94%B2%E9%AA%A8%E6%96%87x-ui%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B%E7%AC%94%E8%AE%B0/20251015112100.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-02</div><div class="title">甲骨文x-ui搭建过程笔记</div></div></a></div><div><a href="/2022/05/31/jsdelivr%E8%A2%AB%E5%A2%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90github%E5%9B%BE%E5%BA%8A%E9%98%B2%E6%AD%A2%E8%A2%ABdns%E6%B1%A1%E6%9F%93/" title="jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染"><img class="cover" src="https://blogimages.happyshark.cn/jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染/20220531165328.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-31</div><div class="title">jsdelivr被墙解决方案——使用自己的域名解析github图床防止被dns污染</div></div></a></div><div><a href="/2022/05/10/SNNU%E6%A0%A1%E5%9B%AD%E7%BD%91%E7%99%BD%E5%AB%96&%E6%A0%A1%E5%9B%AD%E7%BD%91nas%E6%90%AD%E5%BB%BA%E6%8C%87%E5%8D%97/" title="SNNU校园网白嫖&amp;校园网nas搭建指南"><img class="cover" src="https://blogimages.happyshark.cn/SNNU校园网白嫖&校园网nas搭建指南/结构.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-10</div><div class="title">SNNU校园网白嫖&amp;校园网nas搭建指南</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://blogimages.happyshark.cn/hexo/avatar.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">HPShark</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">43</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/HPShark"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:happyshark520@outlook.com" target="_blank" title="Email"><i class="fa fa-envelope"></i></a><a class="social-icon" href="/atom.xml" target="_blank" title="RSS"><i class="fa fa-rss"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">感谢访问，欢迎交换友链~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%83%A8%E7%BD%B2%E7%9B%AE%E6%A0%87"><span class="toc-number">1.</span> <span class="toc-text">环境与部署目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%A1%AE%E8%AE%A4-Docker-%E8%83%BD%E8%AE%BF%E9%97%AE%E6%98%BE%E5%8D%A1"><span class="toc-number">2.</span> <span class="toc-text">先确认 Docker 能访问显卡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E7%9B%AE%E5%BD%95%E4%B8%8E%E6%BA%90%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">准备目录与源码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E6%9E%84%E5%BB%BA%E4%B8%8E%E5%9B%BD%E5%86%85%E6%BA%90"><span class="toc-number">4.</span> <span class="toc-text">配置镜像构建与国内源</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%B9%E5%99%A8%E8%BD%AF%E4%BB%B6%E6%BA%90%E8%84%9A%E6%9C%AC"><span class="toc-number">4.1.</span> <span class="toc-text">1. 容器软件源脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Dockerfile"><span class="toc-number">4.2.</span> <span class="toc-text">2. Dockerfile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9E%84%E5%BB%BA%E8%84%9A%E6%9C%AC"><span class="toc-number">4.3.</span> <span class="toc-text">3. 构建脚本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E4%B8%8E%E5%BC%95%E6%93%8E%E5%8C%B9%E9%85%8D%E7%9A%84%E6%A8%A1%E5%9E%8B"><span class="toc-number">5.</span> <span class="toc-text">下载与引擎匹配的模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E6%8E%A8%E7%90%86%E6%9C%8D%E5%8A%A1"><span class="toc-number">6.</span> <span class="toc-text">启动推理服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8F%82%E6%95%B0%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3"><span class="toc-number">6.1.</span> <span class="toc-text">关键参数如何理解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#256K-%E4%B8%8E-8-%E8%B7%AF%E5%B9%B6%E5%8F%91%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">6.2.</span> <span class="toc-text">256K 与 8 路并发的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3"><span class="toc-number">7.</span> <span class="toc-text">验证接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A5%E5%85%A5-Cherry-Studio-2-0-14"><span class="toc-number">8.</span> <span class="toc-text">接入 Cherry Studio 2.0.14</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%81%87%E5%88%B0-additional-response-fields-%E6%8A%A5%E9%94%99"><span class="toc-number">8.1.</span> <span class="toc-text">遇到 additional response fields 报错</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%8E%B7%E5%8F%96%E6%A8%A1%E5%9E%8B%E5%90%8E%E6%98%BE%E7%A4%BA-100-%E4%B8%87%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">8.2.</span> <span class="toc-text">为什么获取模型后显示 100 万上下文</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%B5%8B%E9%80%9F%E5%BA%A6%E4%B8%8E%E9%A2%84%E6%9C%9F"><span class="toc-number">9.</span> <span class="toc-text">实测速度与预期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%B8%B8%E7%BB%B4%E6%8A%A4"><span class="toc-number">10.</span> <span class="toc-text">日常维护</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">11.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/09/15/RTX%204090%E9%83%A8%E7%BD%B28%E8%B7%AF%E5%B9%B6%E5%8F%91NInfer%E7%89%88Qwen3.8-27B/" title="RTX 4090部署8路并发NInfer版Qwen3.8-27B"><img src="https://blogimages.happyshark.cn/RTX%204090%20%E9%83%A8%E7%BD%B2%20NInfer%E7%89%88Qwen3.8-27B%20256K/20260915170455115.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="RTX 4090部署8路并发NInfer版Qwen3.8-27B"/></a><div class="content"><a class="title" href="/2026/09/15/RTX%204090%E9%83%A8%E7%BD%B28%E8%B7%AF%E5%B9%B6%E5%8F%91NInfer%E7%89%88Qwen3.8-27B/" title="RTX 4090部署8路并发NInfer版Qwen3.8-27B">RTX 4090部署8路并发NInfer版Qwen3.8-27B</a><time datetime="2026-09-14T16:00:00.000Z" title="发表于 2026-09-15 00:00:00">2026-09-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/" title="esxi硬盘精简置备、厚置备切换"><img src="https://blogimages.happyshark.cn/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/20260912000146180.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="esxi硬盘精简置备、厚置备切换"/></a><div class="content"><a class="title" href="/2026/09/11/esxi%E7%A1%AC%E7%9B%98%E7%B2%BE%E7%AE%80%E7%BD%AE%E5%A4%87%E3%80%81%E5%8E%9A%E7%BD%AE%E5%A4%87%E5%88%87%E6%8D%A2/" title="esxi硬盘精简置备、厚置备切换">esxi硬盘精简置备、厚置备切换</a><time datetime="2026-09-10T16:00:00.000Z" title="发表于 2026-09-11 00:00:00">2026-09-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/" title="实验室内网部署本地overleaf-CEP"><img src="https://blogimages.happyshark.cn/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/20260109233539.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="实验室内网部署本地overleaf-CEP"/></a><div class="content"><a class="title" href="/2026/01/08/%E5%AE%9E%E9%AA%8C%E5%AE%A4%E5%86%85%E7%BD%91%E9%83%A8%E7%BD%B2%E6%9C%AC%E5%9C%B0overleaf-CEP/" title="实验室内网部署本地overleaf-CEP">实验室内网部署本地overleaf-CEP</a><time datetime="2026-01-07T16:00:00.000Z" title="发表于 2026-01-08 00:00:00">2026-01-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"><img src="https://blogimages.happyshark.cn/ESXI%E7%9A%84win10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/20251106163319.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案"/></a><div class="content"><a class="title" href="/2025/11/06/ESXIwin10%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%B7%91hyper-v%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案">ESXI的win10虚拟机跑hyper-v虚拟机无法上网解决方案</a><time datetime="2025-11-05T16:00:00.000Z" title="发表于 2025-11-06 00:00:00">2025-11-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/22/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B-%E7%AC%94%E8%AE%B0/" title="不安全的实例"><img src="https://blogimages.happyshark.cn/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B/F6fbBd.png" onerror="this.onerror=null;this.src='https://blogimages.happyshark.cn/hexo/404.jpg'" alt="不安全的实例"/></a><div class="content"><a class="title" href="/2025/04/22/%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E4%BE%8B-%E7%AC%94%E8%AE%B0/" title="不安全的实例">不安全的实例</a><time datetime="2025-04-21T16:00:00.000Z" title="发表于 2025-04-22 00:00:00">2025-04-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2016 - 2026 By HPShark</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">有问题为什么不问问神奇的海螺呢？</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js" type="module"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.5.0/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const loadUtterances = () => {
+    let ele = document.createElement('script')
+    ele.id = 'utterances_comment'
+    ele.src = 'https://utteranc.es/client.js'
+    ele.setAttribute('repo', 'HPShark/blogcomment')
+    ele.setAttribute('issue-term', 'title')
+    const nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+    ele.setAttribute('theme', nowTheme)
+    ele.crossOrigin = 'anonymous'
+    ele.async = true
+    document.getElementById('utterances-wrap').appendChild(ele)
+  }
+
+  const utterancesTheme = theme => {
+    const iframe = document.querySelector('.utterances-frame')
+    if (iframe) {
+      const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+      const message = {
+        type: 'set-theme',
+        theme: theme
+      };
+      iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+    }
+  }
+
+  btf.addGlobalFn('themeChange', utterancesTheme, 'utterances')
+
+  if ('Utterances' === 'Utterances' || !false) {
+    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+    else loadUtterances()
+  } else {
+    window.loadOtherComment = loadUtterances
+  }
+})()</script></div><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const findTrueUrl = (array) => {
+    Promise.all(array.map(item =>
+      fetch(item.url).then(resp => resp.json()).then(data => {
+        const urlArray = data.body.match(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/ig)
+        if (data.user.login === 'utterances-bot') {
+          return urlArray.pop()
+        } else {
+          return urlArray.shift()
+        }
+      })
+    )).then(res => {
+        array = array.map((i,index)=> {
+          return {
+            ...i,
+            url: res[index]
+          }
+        })
+
+        saveToLocal.set('github-newest-comments', JSON.stringify(array), 10/(60*24))
+        generateHtml(array)
+    });
+  }
+
+  const getComment = () => {
+    fetch('https://api.github.com/repos/HPShark/blogcomment/issues/comments?sort=updated&direction=desc&per_page=6&page=1',{
+      "headers": {
+        Accept: 'application/vnd.github.v3.html+json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const githubArray = data.map(item => {
+          return {
+            'avatar': item.user.avatar_url,
+            'content': changeContent(item.body_html),
+            'nick': item.user.login,
+            'url': item.issue_url,
+            'date': item.updated_at,
+            'githubUrl': item.html_url
+          }
+        })
+        findTrueUrl(githubArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.textContent= "无法获取评论，请确认相关配置是否正确"
+      })
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('github-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><div class="aplayer no-destroy" data-id="321805866" data-server="netease" data-order="random" data-type="playlist" data-mini="true" data-fixed="true" data-autoplay="true"> </div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-nest.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/click-show-text.min.js" data-mobile="true" data-text="计算机,豆浆机,榨汁机,传真机,汽轮机,内燃机,灭火机,掘土机,扩音机,截击机,教练机,舰载机,录音机,録音机,录像机,录影机,留声机,离心机,老虎机,冷冻机,歼击机,交换机,鼓风机,轰炸机,滑翔机,发电机,放映机,法郎机,发动机,反潜机,发报机,缝纫机,复印机,锅驼机,滚齿机,油印机,永动机,轧道机,轧钢机,凿岩机,运输机,榨油机,轧染机,战斗机,直升机,织布机,制冷机,照相机,侦察机,装载机,缫丝机,坐飞机,钻探机,钻井机,涡轮机,洗衣机,压路机,压缩机,旋翼机,压力机,心肺机,扬谷机,预警机,曳引机,速印机,通风机,透平机,送风机,拖拉机,推土机,脱粒机,小军机,寻呼机,打桩机,打印机,打字机,打火机,电话机,铲土机,柴油机,吹风机,耳塞机,电唱机,电报机,杜德机,电视机,电动机,对撞机,对讲机,放像机,动力机,订书机,铲运机,步谈机,报话机,步话机,播种机,伞翼机,扇风机,扫除机,爆炸机,收报机,摄像机,收录机,收音机,升降机,视盘机,升船机,说兵机,水轮机,顺风机,水上飞机,收发信机,数码相机,数字相机,生态危机,审势相机,暗藏杀机,傻里巴机,傻里八机,白费心机,剥复之机,财政危机,不失时机,持重待机,犯罪动机,喘息之机,东条英机,倒纻翻机,错过时机,枉费心机,枉用心机,微特电机,天赐良机,通险畅机,随物应机,贻误军机,一日万机,一线生机,斜翼飞机,泄露天机,鸭式飞机,泄漏天机,袖里玄机,坐失事机,坐失良机,走漏天机,运策决机,用尽心机,语不投机,光计算机,购买动机,观变沉机,工作母机,费尽心机,反潜飞机,话不投机,航天飞机,火箭飞机,活泼天机,漏泄天机,可乘之机,静不露机,经济危机,决胜之机,将机就机,空天飞机,军用飞机,鸥鸟忘机,妙算神机,鸥鹭忘机,日理万机,燃气轮机,施关发机,日有万机,煞费心机,全天候飞机,汽轮发电机,喷气式飞机,喷气发动机,联合收割机,卡式录音机,绝热发动机,空气压缩机,空中加油机,火箭发动机,轮式拖拉机,活塞式飞机,航空发动机,海军轰炸机,反潜直升机,分时计算机,异步发电机,异步电动机,直流发电机,直流电动机,中央处理机,中华学习机,专用计算机,自动取款机,自动柜员机,武装直升机,亚声速飞机,外围处理机,同步电动机,通用计算机,同步发电机,网络计算机,微型计算机,电影放映机,电影摄影机,电视摄影机,单板计算机,调频收音机,电子计算机,电视接收机,电子游戏机,超声速飞机,实时计算机,手扶拖拉机,水轮发电机,数据流计算机,变后掠翼飞机,电子对抗飞机,无人驾驶飞机,混凝土搅拌机,工业用拖拉机,混凝土振捣机,履带式拖拉机,控制流计算机,空气喷气发动机,卡拉ok伴唱机,涡轮螺旋桨飞机,单片微型计算机,电子数字计算机,电子模拟计算机,第三代电子计算机,第四代电子计算机,第五代电子计算机,第一代电子计算机,第二代电子计算机,活塞式航空发动机,混合式电子计算机,难得者时，易失者机,垂直和短距起落飞机,善观风色，善择时机,双水内冷汽轮发电机" data-fontsize="15px" data-random="false" async="async"></script><div class="fb-customerchat" id="fb-customer-chat" page_id="106213005918479" attribution="biz_inbox"></div><script>(() => {
+  document.getElementById('fb-root') ? '' : document.body.insertAdjacentHTML('afterend', '<div id="fb-root"></div>')
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml: true,
+      version: 'v16.0'
+    });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/zh_CN/sdk/xfbml.customerchat.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  const isChatBtn = true
+  const isChatHideShow = true
+
+  if (isChatBtn) {
+    window.chatBtnFn = () => {
+      const isShow = document.querySelector('.fb_customer_chat_bounce_in_v2')
+      isShow ? FB.CustomerChat.hide() : FB.CustomerChat.show()
+    }
+  } else if (isChatHideShow) {
+    window.chatBtn = {
+      hide: () => {
+        FB.CustomerChat.hide()
+      },
+      show: () => {
+        FB.CustomerChat.show(false)
+      }
+    }
+  }
+})()</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/metingjs/dist/Meting.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/Gallery/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'UA-116830180-1', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":120,"height":240,"hOffset":30},"mobile":{"show":true}});</script></body></html>
